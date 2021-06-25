@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="./css/register.css">
+        <title>회원가입 페이지</title>
+    </head>
+    <body>
+            <div id="wrapper">
+                <a href="/">
+                    <div id="header" class="register" role="banner"></div>
+                </a>
+                <div id="content">
+                    <form id="register" method="post" action="/new">
+
+                    <div class="row">
+                        <div class="id">
+                            <h3>
+                                <label for="id">아이디</label>
+                            </h3>
+                                <span class ="box id">
+                                    <input type="text" id="id" class="int" title="아이디" maxlength="20" name="ID">
+                                    <span class="max_len">최대 20자임</span>
+                                </span>
+                                <span class="error" id="idmsg" style = "display:none" aria-live="assertive" ></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="pswd">
+                            <h3>
+                                <label for="pswd">비밀번호</label>
+                            </h3>
+                            <span class="box pswd">
+                                <input type="password" id="pass1" class="int" maxlength="20" title="비번" name="PASS1">
+                            </span>
+                            <span class="error" id="pass1msg" style = "display:none" aria-live="assertive" ></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="pswd">
+                            <h3>
+                                <label for="pswd2">비밀번호 확인</label>
+                            </h3>
+                            <span class="box pswd">
+                                <input type="password" id="pass2" class="int" maxlength="20" title="비번확인" name="PASS2">
+                            </span>
+                            <span class="error" id="pass2msg" style = "display:none" aria-live="assertive" ></span>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="name">
+                            <h3>
+                                <label for="name">이름</label>
+                            </h3>
+                            <span class="box name">
+                                <input type="text" id="name" class="int" maxlength="20" title="이름" name="NAME">
+                            </span>
+                            <span class="error" id="namemsg" style = "display:none" aria-live="assertive" ></span>
+                        </div>
+                    </div>
+
+                    <div class ="btn">
+                        <button type="submit" id="btn_register" class = "btn_register" title="가입하기">
+                            <span>
+                                가입하기
+                            </span>
+                        </button>
+                    </div>
+                    
+                </form>
+                </div>
+            </div>
+        
+    </body>
+    <script>
+        var id_yip_ryeok_chang = document.getElementById('id');
+        var pass_one = document.getElementById('pass1');
+        var pass_two = document.getElementById('pass2');
+        var name_yip_ryeok_chang = document.getElementById('name');
+        var idcheck = false;
+        var passone_check = false;
+        var passtwo_check = false;
+        var name_check = false;
+        function pilsu_jeongbo_yipnida(text,span)
+        {
+            if(text==="")
+            {
+                span.innerHTML="필수정보 입니다.";
+                span.style.display='block';
+            }
+        }
+        id_yip_ryeok_chang.addEventListener('change',function()//아이디 검사
+        {
+        //console.log('아이디변경 감지됨');
+        //console.log(id_yip_ryeok_chang.value);
+        var id_text = id_yip_ryeok_chang.value;
+        var id_message = document.getElementById('idmsg');
+        pilsu_jeongbo_yipnida(id_text,id_message);
+        });
+        pass_one.addEventListener('change',function()//비번검사
+        {
+            var pass1_text = pass_one.value;
+            var pass1_message = document.getElementById('pass1msg');
+            pilsu_jeongbo_yipnida(pass1_text,pass1_message);
+        });
+        pass_two.addEventListener('change',function()//비번확인검사
+        {
+            var pass2_text = pass_two.value;
+            var pass2_message = document.getElementById('pass2msg');
+            pilsu_jeongbo_yipnida(pass2_text,pass2_message);
+        });
+        name_yip_ryeok_chang.addEventListener('change',function()//이름검사
+        {
+            var name_text = name_yip_ryeok_chang.value;
+            var name_message = document.getElementById('namemsg');
+            pilsu_jeongbo_yipnida(name_text,name_message);
+        });
+        
+    </script>
+</html>
