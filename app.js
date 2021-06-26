@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const indexRouter = require('./routes/index');
 const registerRouter = require('./routes/register');
 const newRouter = require('./routes/new_person');
+const LoginRouter = require('./routes/login');
 const { sequelize } = require('./models');
 
 const router = express.Router();//라우터 받아옴
@@ -29,7 +30,7 @@ app.use(express.static(__dirname+'/public'));
 app.use('/',indexRouter);
 app.use('/register',registerRouter);
 app.use('/new',newRouter);
-
+app.use('/login',LoginRouter);
 app.use((req,res,next)=>
 {
     res.status(404).send('하 안된다! 404');
