@@ -1,6 +1,37 @@
 body{
-    height: 10000px;
+    height: 1000px;
     text-align: center;
+}
+#wrapper {
+    position: absolute;
+    left: 25%;
+    width:50%;
+    height:100%;
+    /*text-align: center;*/
+    /*border: 1px solid black;*/
+}
+#header{
+    /*top:0%;*/
+    max-width: 100%;
+    /* height: 120px;*/
+    max-height: 15%;
+}
+#header .banner
+{
+    height: 110px;
+    display: block;
+    background-image: url("../images/banner.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.blind
+{
+    width:1px;
+    height:1px;
+    margin:-1px;
+    position: absolute;
+    clip: rect(0 0 0 0);
+    overflow: hidden;
 }
 #content {
     position: absolute;
@@ -8,26 +39,11 @@ body{
     transform: translate(-50%);
     width: 460px;
 }
-#header{
-    background-image: url("../images/banners.jpg");
-    background-repeat: no-repeat;
-    background-position: center;
-    top: 0%;
-    width: 100%;
-    /* height: 120px; */
-    height: 20%;
-}
-#wrapper {
-    position: absolute;
-    left: 25%;
-    width:50%;
-    height:100%;
-    text-align: center;
-    /*border: 1px solid black;*/
-}
+
 h3
 {
     color:goldenrod;
+    left:0%;
     font-size: 14px;
 }
 .max_len {/*최대 20자 이상 그거*/

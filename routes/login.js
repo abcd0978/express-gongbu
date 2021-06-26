@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const session = require('express-session');
 const router = express.Router();
 
 router.use(express.json()); 
@@ -13,9 +14,10 @@ router.route('/')
 
 router.route('/submit').post(async(req,res)=>
 {
+    var response;
     try{
-        console.log(req.body.ID);
-        console.log(req.body.PASS);
+        console.log("아이디: "+req.body.ID);
+        console.log("비번: "+req.body.PASS);
     }
     catch(err)
     {

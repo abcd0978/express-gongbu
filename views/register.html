@@ -7,9 +7,15 @@
     </head>
     <body>
             <div id="wrapper">
-                <a href="/">
-                    <div id="header" class="register" role="banner"></div>
-                </a>
+
+                <div id="header">
+                    <a href="/" class="banner">
+                        <span class="blind">
+                            사람사는세상
+                        </span>
+                    </a>
+                </div>
+
                 <div id="content">
                     <form id="register" method="post" action="/new">
 
@@ -103,6 +109,7 @@
         var passone_check = false;
         var passtwo_check = false;
         var name_check = false;
+        var email_check = false;
         function pilsu_jeongbo_yipnida(text,span)
         {
             if(text==="")
@@ -119,12 +126,14 @@
                 sex.type = "text";
                 sex.readOnly = false;
                 sex.value= "";
+                sex.style.backgroundColor="#91D8FA";
                 console.log('sex');
             }
             else
             {
                 sex.value = value;
-                sex.readOnly = true;   
+                sex.readOnly = true;
+                sex.style.backgroundColor = "darkgrey";
             }
         }
         id_yip_ryeok_chang.addEventListener('change',function()//아이디 검사

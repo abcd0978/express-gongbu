@@ -2,15 +2,54 @@
 <html lang="ko">
     <head>
         <meta charset="UTF-8">
+        <link rel="stylesheet" href="./css/login.css">
         <title>로그인 페이지</title>
     </head>
     <body>
-        <form method="post" id="login" action="/login/submit">
-            아이디 입력: <input type="text" id="id" name="ID">
-            비번 입력: <input type="password" id="passwd" name="PASS">
-            <button type="submit">
-                제출
-            </button>
-        </form>
+        <div id="wrapper">
+            <div id="header">
+                <a href="/" class="banner">
+                    <span class="blind">
+                        사람사는세상
+                    </span>
+                </a>
+            </div>
+            <div id="content">
+                <form method="post" id="login" action="/login/submit">
+
+                    <div id="row">
+                        <div id="id">
+                            <h3>
+                                <label for="id">아이디</label>
+                            </h3>
+                            <span class="box id">
+                                <input type="text" id="id" name="ID">
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="row">
+                        <div id="password">
+                            <h3>
+                                <label for="pass">비번</label>
+                            </h3>
+                            <span class="box pass">
+                                <input type="password" id="passwd" name="PASS">
+                            </span>
+                        </div>
+                    </div>
+                        
+                    <div id="row">
+                        <button type="submit" id="btn_login" class="btn" name="BUTTON">
+                            제출
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div id="footer">
+
+            </div>
+        </div>
+        
     </body>
 </html>

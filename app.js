@@ -24,8 +24,30 @@ sequelize.sync({force: false})
     });
 app.set('port',process.env.PORT || 80);// 80
 app.use(morgan('dev'));
+app.use(session({
+    resave:false,
+    saveUninitialized:false,
+    secret: "fuckyou",
+    cookie:{
+        httpOnly:true,
+    },
+    //name:'connet.sid' 이걸로 초기화 되어있음
+}))
+
 app.use(express.static(__dirname+'/views'));
-app.use(express.static(__dirname+'/public'));
+
+/* 이거쓰면 static파일을 세션을 받은사람만 볼수 있게 할수 있다.
+app.use('/',(req,res,next)=>{
+    if(req.session.id)
+    {
+        app.use(express.static(__dirname+'/views'))(req,res,next)
+    }
+    else{
+        next()
+    }
+})
+*/
+//app.use(express.static(__dirname+'/public'));
 
 app.use('/',indexRouter);
 app.use('/register',registerRouter);
