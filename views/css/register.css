@@ -51,6 +51,18 @@ h3
     width:100%;
     height:29px;
 }
+#email/*이메일은 셀렉트 박스 있으니까 input은 좀 치워두자*/
+{
+    border:solid 1px;
+    width:30%;
+    height:29px;
+}
+#email2/*ㅅㅂ*/
+{
+    background-color:darkgrey;
+    width:30%;
+    height:29px;
+}
 .row{
     margin: 25px;
 }

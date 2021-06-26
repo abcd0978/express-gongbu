@@ -62,6 +62,25 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="email">
+                            <h3>
+                                <label for="name">이메일</label>
+                            </h3>
+                            <span class="box email">
+                                <input type="text" id="email" class="int" maxlength="20" title="이메일" name="EMAIL1">
+                                <input type="text" id="email2" class="int" maxlength="20" title="이메일주소" name="EMAIL2" value="@gmail.com" readonly>
+                                <select name="EMAIL3" onchange="emailfunc(value)">
+                                    <option value="@gmail.com">@gmail.com</option>
+                                    <option value="@naver.com">@naver.com</option>
+                                    <option value="@hanmail.net">@hanmail.net</option>
+                                    <option value="0">직접입력</option>
+                                </select>
+                            </span>
+                            <span class="error" id="emailmsg" style = "display:none" aria-live="assertive" ></span>
+                        </div>
+                    </div>
+
                     <div class ="btn">
                         <button type="submit" id="btn_register" class = "btn_register" title="가입하기">
                             <span>
@@ -90,6 +109,22 @@
             {
                 span.innerHTML="필수정보 입니다.";
                 span.style.display='block';
+            }
+        }
+        function emailfunc(value)
+        {
+            var sex = document.getElementById('email2');
+            if(value==="0")
+            {
+                sex.type = "text";
+                sex.readOnly = false;
+                sex.value= "";
+                console.log('sex');
+            }
+            else
+            {
+                sex.value = value;
+                sex.readOnly = true;   
             }
         }
         id_yip_ryeok_chang.addEventListener('change',function()//아이디 검사
