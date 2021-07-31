@@ -2,6 +2,10 @@
 <html lang="ko">
     <head>
         <meta charset="UTF-8">
+        <script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
         <link rel="stylesheet" href="./css/register.css">
         <title>회원가입 페이지</title>
     </head>
@@ -17,7 +21,7 @@
                 </div>
 
                 <div id="content">
-                    <form id="register" method="post" action="/new">
+                    <form id="register" method="post" action="/auth/join">
 
                     <div class="row">
                         <div class="id">
@@ -59,7 +63,7 @@
                     <div class="row">
                         <div class="name">
                             <h3>
-                                <label for="name">이름</label>
+                                <label for="name">닉네임</label>
                             </h3>
                             <span class="box name">
                                 <input type="text" id="name" class="int" maxlength="20" title="이름" name="NAME">
@@ -71,17 +75,10 @@
                     <div class="row">
                         <div class="email">
                             <h3>
-                                <label for="name">이메일</label>
+                                <label for="email">이메일</label>
                             </h3>
                             <span class="box email">
-                                <input type="text" id="email" class="int" maxlength="20" title="이메일" name="EMAIL1">
-                                <input type="text" id="email2" class="int" maxlength="20" title="이메일주소" name="EMAIL2" value="@gmail.com" readonly>
-                                <select name="EMAIL3" onchange="emailfunc(value)">
-                                    <option value="@gmail.com">@gmail.com</option>
-                                    <option value="@naver.com">@naver.com</option>
-                                    <option value="@hanmail.net">@hanmail.net</option>
-                                    <option value="0">직접입력</option>
-                                </select>
+                                <input type="text" id="email" class="int" maxlength="50" title="이메일" name="EMAIL">
                             </span>
                             <span class="error" id="emailmsg" style = "display:none" aria-live="assertive" ></span>
                         </div>
@@ -100,67 +97,111 @@
             </div>
         
     </body>
-    <script>
+    <script type="text/javascript">
         var id_yip_ryeok_chang = document.getElementById('id');
         var pass_one = document.getElementById('pass1');
         var pass_two = document.getElementById('pass2');
         var name_yip_ryeok_chang = document.getElementById('name');
+        var user_email = document.getElementById('email');
         var idcheck = false;
         var passone_check = false;
         var passtwo_check = false;
         var name_check = false;
         var email_check = false;
-        function pilsu_jeongbo_yipnida(text,span)
+        $(document).ready(function()
+        {
+            var userIdCheck = function(msg)
+            {
+                var idvalue = $('#id').val()
+                var checkDup;
+                var request = $.ajax({
+                    url: "/login/check",
+                    method: "post",
+                    data: {ID: idvalue, IDEMAILFLAG: false},
+                    datatype: "json",
+                    async: false,
+                    success:function(res)
+                    {
+                        console.log(res);
+                    },
+                });
+            }
+            //$('#ele').focusout(function() {
+            //    $(this).addClass('hidden');
+            //});
+            var userEmailCheck = function(msg)
+            {
+                var emailvalue = $('#email').val();
+                var checkDup;
+                var request = $.ajax({
+                    url: "/login/check",
+                    method: "post",
+                    data: {EMAIL1: emailvalue, IDEMAILFLAG: true},
+                    datatype: "json",
+                    async: false,
+                    success:function(res)
+                    {
+                        console.log(res);
+                    },
+                });
+            }
+        });
+        
+        function pilsu(text,span)//필수정보라고 알려주는거
         {
             if(text==="")
             {
                 span.innerHTML="필수정보 입니다.";
                 span.style.display='block';
             }
+            else{
+                span.style.display='none';
+            }
         }
-        function emailfunc(value)
+        function pass2check(pass1,pass2,pass2msg)
         {
-            var sex = document.getElementById('email2');
-            if(value==="0")
+            if(pass1!=pass2)
             {
-                sex.type = "text";
-                sex.readOnly = false;
-                sex.value= "";
-                sex.style.backgroundColor="#91D8FA";
-                console.log('sex');
+                pass2msg.innerHTML="비밀번호가 일치하지 않습니다."
             }
             else
             {
-                sex.value = value;
-                sex.readOnly = true;
-                sex.style.backgroundColor = "darkgrey";
+                pass2msg.style.display="none";
             }
         }
-        id_yip_ryeok_chang.addEventListener('change',function()//아이디 검사
+        id_yip_ryeok_chang.addEventListener('focusout',function()//아이디 검사
         {
-        //console.log('아이디변경 감지됨');
-        //console.log(id_yip_ryeok_chang.value);
-        var id_text = id_yip_ryeok_chang.value;
-        var id_message = document.getElementById('idmsg');
-        pilsu_jeongbo_yipnida(id_text,id_message);
+        let id_text = id_yip_ryeok_chang.value;
+        let id_message = document.getElementById('idmsg');
+        pilsu(id_text,id_message);
         });
-        pass_one.addEventListener('change',function()//비번검사
+
+        pass_one.addEventListener('focusout',function()//비번검사
         {
             var pass1_text = pass_one.value;
-            var pass1_message = document.getElementById('pass1msg');
-            pilsu_jeongbo_yipnida(pass1_text,pass1_message);
+            let pass1_message = document.getElementById('pass1msg');
+            pilsu(pass1_text,pass1_message);
         });
-        pass_two.addEventListener('change',function()//비번확인검사
+
+        pass_two.addEventListener('focusout',function()//비번확인검사
         {
-            var pass2_text = pass_two.value;
-            var pass2_message = document.getElementById('pass2msg');
-            pilsu_jeongbo_yipnida(pass2_text,pass2_message);
+            let pass2_text = pass_two.value;
+            let pass2_message = document.getElementById('pass2msg');
+            pass2check(pass1_text,pass2_text,pass2_message);
+            //pilsu(pass2_text,pass2_message);
         });
-        name_yip_ryeok_chang.addEventListener('change',function()//이름검사
+
+        name_yip_ryeok_chang.addEventListener('focusout',function()//이름검사
         {
-            var name_text = name_yip_ryeok_chang.value;
-            var name_message = document.getElementById('namemsg');
-            pilsu_jeongbo_yipnida(name_text,name_message);
+            let name_text = name_yip_ryeok_chang.value;
+            let name_message = document.getElementById('namemsg');
+            pilsu(name_text,name_message);
+        });
+        user_email.addEventListener('focusout',function()//이메일 검사
+        {
+            let email_text = user_email.value;
+            let email_msg = document.getElementById('emailmsg');
+            //pilsu(email_text,email_msg); //이메일은 필수 아니잖아?
         });
         
     </script>

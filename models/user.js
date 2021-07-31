@@ -19,13 +19,18 @@ module.exports = class User extends Sequelize.Model
                 },
                 pass://비번
                 {
-                    type: Sequelize.STRING(20),
+                    type: Sequelize.STRING(300),
                     allowNull: false,
                 },
                 email://이메일
                 {
                     type: Sequelize.STRING(50),
                     allowNull: true,
+                },
+                salt:
+                {
+                    type: Sequelize.STRING(300),
+                    allowNull: false,
                 },
                 user_id: //PK
                 {

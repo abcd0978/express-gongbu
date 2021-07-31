@@ -2,6 +2,10 @@
 <html lang="ko">
     <head>
         <meta charset="UTF-8">
+        <script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
         <link rel="stylesheet" href="./css/login.css">
         <title>로그인 페이지</title>
     </head>
@@ -23,7 +27,7 @@
                                 <label for="id">아이디</label>
                             </h3>
                             <span class="box id">
-                                <input type="text" id="id" name="ID">
+                                <input type="text" id="id_input" name="ID">
                             </span>
                         </div>
                     </div>
@@ -34,8 +38,13 @@
                                 <label for="pass">비번</label>
                             </h3>
                             <span class="box pass">
-                                <input type="password" id="passwd" name="PASS">
+                                <input type="password" id="passwd_input" name="PASS">
                             </span>
+
+                            <span style="display:none" id="error">
+                                error
+                            </span>
+
                         </div>
                     </div>
                         
@@ -52,4 +61,85 @@
         </div>
         
     </body>
+
+    <script>
+        function is_empty(id,pass)
+        {
+            if(id.length===0 || pass.length===0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        function doubleSubmittingFaggots(flag)
+        {
+            if(flag)
+            {
+                flag = false;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        window.addEventListener('load',(e)=>//로드되었을때 실행된다.
+        {
+            const loginBtn = document.getElementById('btn_login');
+            const form = document.getElementById('login');
+            var errorSpan = document.getElementById('error');
+            let isDoubleSubmit = true;
+            loginBtn.addEventListener('click',(e)=>//로그인 버튼을 눌렀을때 실행될 작업들
+            {
+                if(doubleSubmittingFaggots(isDoubleSubmit))//두번이상 제출 방지
+                {
+                    console.log('두번은 안됨');
+                    return;
+                }
+                e.preventDefault();
+                let loginId = document.getElementById('id_input').value;
+                let loginPass = document.getElementById('passwd_input').value;
+                if(is_empty(loginId,loginPass))
+                {
+                    errorSpan.innerHTML = "모두 입력해 주세요";
+                    errorSpan.style.display = 'block';
+                    errorSpan.style.color="#FF0000"
+                    return;
+                }
+                let Data = 
+                {
+                    method: 'POST',
+                    headers:{
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ID: loginId, PASS: loginPass})
+                };
+
+                fetch('auth/submit',Data)
+                .then(async function(res)
+                {
+                    if(res.redirected)//성공시
+                    {
+                        window.location.href = res.url;//fetch로 하면 이따구로 해야됨
+                    }
+                    else//실패시
+                    {
+                        return res.json();
+                    }
+                })
+                .then(async function(json)
+                {
+                    let message = json.message;
+                    errorSpan.innerHTML = message;
+                    errorSpan.style.display = 'block';
+                    errorSpan.style.color="#FF0000"
+                })
+                
+            });
+    })
+    </script>
+
 </html>

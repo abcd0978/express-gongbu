@@ -2,29 +2,165 @@
 <html lang="ko">
     <head>
         <meta charset="UTF-8">
-        <title>사람사는세상.</title>
+        <script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+        <!--<link rel="stylesheet" href="./css/index.css">!-->
+        <title>6chan</title>
     </head>
     <body>
-        <div id = "wrapper">
-            <div id="header">
+        
+        <div class = "wrapper">
+
+            <header>
+
+                <div class="logo">
+                    <a href="/" class="banner">
+                        <img src="images/white-fag.png" style= "height: auto;">
+                    </a>
+                </div>                
+
+                <ul class="gnb">
+                    <li><a href="#" class="fadeup">마이페이지</a></li>
+                    <li><a href="#" class="fadeup">채팅</a></li>
+                    <li><a href="/register" class="fadeup">회원가입</a></li>
+                    <li><a href="/login" id = "loginText" class="fadeup"></a></li>
+                </ul>
+                
+
+            </header>
+
+            <div id="container">
+
+                
 
             </div>
-            <div id="content">
 
-            </div>
-            <div id="footer">
+            <footer>
+                
+            </footer>
 
-            </div>
         </div>
-        <h1>
-            안녕하세요 회원가입 또는 로그인 하실래요
-        </h1>
-        <a href="/register">
-            회원가입하러 가기
-        </a>
-        <br>
-        <a href="/login">
-            로그인하러 가기
-        </a>
+        
+        
     </body>
+    <style>
+        body, html
+        {
+            height:100%;
+        }
+            .wrapper
+            {
+                height:100%;
+                max-width:1200px;
+                margin: 0 auto;/*left right마진을 자동으로 함으로서 중앙정렬*/
+                
+            }
+                header
+                {
+                    background-image:url("images/main.jpg");
+                    height: 700px;
+                    position: fixied;
+                    width: 100%;/*wrapper의 1200px에 맞춤*/
+                    z-index: 9999;/*우선 순위가 높을수록 z축의 위에 배치된다*/
+                    top: 0;
+                }
+                    .logo
+                    {
+                        left:20px;
+                        width: 180px;
+                        float:left;
+                    }
+                    .gnb
+                    {
+                        width:1160px;
+                        height:75px;
+                    }
+                        .gnb li/*글씨를 담는 영역*/
+                        {
+                            height:60px;
+                            list-style: none;/*글씨 앞에 점 안보이게 함*/
+                            float:right;
+                        }
+                            .gnb a/*글씨와 링크*/
+                            {
+                                opacity: 0.75;
+                                position:relative;
+                                font-family: 'Pretendard-Regular';
+                                font-size: large;
+                                color:white;
+                                text-decoration-line:none;/*밑줄 사라짐*/
+                                display: block;/*padding의 크기만큼 클릭하는 칸이 늘어남*/
+                                padding: 20px 30px;/*클릭하는칸이 차지하는 크기*/
+                                margin: 7px 7px;/*클릭하는 칸들의 간격*/
+                            }
+                            .gnb a:hover/*마우스가 올라갔을때*/
+                            {
+                                opacity: 1;
+                            }
+                            .gnb a::before 
+                            {
+                            transition: 300ms;/*애니메이션의 시간*/
+                            height: 5px;
+                            content: "";
+                            position: absolute;
+                            background-color:darkslategrey;
+                            }
+
+                            .fadeup::before 
+                            {
+                            position:absolute;
+                            left:25%;
+                            width: 55%;
+                            bottom: 5px;
+                            opacity: 0;
+                            }
+
+                            .fadeup:hover::before 
+                            {
+                            bottom: 10px;
+                            opacity: 0.86;
+                            }
+
+                            @font-face 
+                            {
+                                font-family: 'Pretendard-Regular';
+                                src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+                                font-weight: 600;
+                                font-style: normal;
+                            }
+    </style>
+    <script>
+            function isLoggedin()
+            {
+                fetch('/validcheck/check2',{
+                method: 'GET',
+                credentials:'include',
+                })
+                .then(res=>
+                {
+                    return res.json();
+                })
+                .then(res=>
+                {
+                    console.log(res);
+                    if(res)//로그인 되어있을시에 로그아웃 주소로 돌림
+                    {
+                        document.getElementById('loginText').innerText="로그아웃";
+                        $("#loginText").attr("href","/auth/logout");
+                    }
+                    else
+                    {
+                        document.getElementById('loginText').innerText="로그인";
+                        $("#loginText").attr("href","/login");
+                    }
+                })
+                .catch(err=>
+                {
+                    console.log(err);
+                });   
+            }
+            isLoggedin();
+    </script>
 </html>
