@@ -15,5 +15,13 @@ router.route('/login').get((req,res,next)=>
 {
     res.sendFile(path.join(__dirname,'../views','login.html'));
 })
+router.route('/chatting').get((req,res,next)=>//채팅 페이지
+{
+    res.sendFile(path.join(__dirname,'../views','chatting.html'));
+})
+router.route('/mypage').get((req,res,next)=>//마이페이지 페이지
+{
+    res.sendFile(path.join(__dirname,'../views','mypage.html'));
+})
 
 module.exports = router;

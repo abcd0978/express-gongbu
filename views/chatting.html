@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+        <title>chatting</title>
+    </head>
+    <body>
+       <h1>welcome to chatting</h1>
+        
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io.connect("http://14.38.252.76:80",//80번포트->내 라즈베리파이로 포트포워딩 되어있음
+        {
+            path:'/socket.io',
+            transports:['websocket'],
+        });
+        socket.on('news',(data)=>
+        {
+            console.log(data);
+            socket.emit('reply','hello world');
+        });
+
+    </script>
+</html>

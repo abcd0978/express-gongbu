@@ -10,6 +10,7 @@ const passportConfig = require('./passport');
 const pagesRouter = require('./routes/pages');
 const authRouter = require('./routes/auth');
 const validCheckRouter = require('./routes/validcheck');
+const Socket = require('./socket');
 const { sequelize } = require('./models');
 dotenv.config();
 
@@ -72,7 +73,9 @@ app.use((req,res,next)=>
     res.status(404).send('하 안된다! 404');
 });
 
-app.listen(app.get('port'),()=>
+const server = app.listen(app.get('port'),()=>
 {
     console.log(app.get('port')+'번 포트에서 대기중');
 });
+
+Socket(server);

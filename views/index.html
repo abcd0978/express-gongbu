@@ -19,11 +19,17 @@
                     <a href="/" class="banner">
                         <img src="images/white-fag.png" style= "height: auto;">
                     </a>
-                </div>                
+                </div>            
+
+                <div class="name">
+                    <h1 id="sayhi">
+                        
+                    </h1>
+                </div>
 
                 <ul class="gnb">
-                    <li><a href="#" class="fadeup">마이페이지</a></li>
-                    <li><a href="#" class="fadeup">채팅</a></li>
+                    <li><a href="/mypage" class="fadeup">마이페이지</a></li>
+                    <li><a href="/chatting" class="fadeup">채팅</a></li>
                     <li><a href="/register" class="fadeup">회원가입</a></li>
                     <li><a href="/login" id = "loginText" class="fadeup"></a></li>
                 </ul>
@@ -72,16 +78,25 @@
                         width: 180px;
                         float:left;
                     }
+                    .name
+                    {
+                        opacity: 0.85;
+                        color:#454545;
+                        text-align: center;
+                        left:0;
+                        width:500px;
+                        float:left;
+                    }
                     .gnb
                     {
-                        width:1160px;
+                        width:100%;
                         height:75px;
                     }
                         .gnb li/*글씨를 담는 영역*/
                         {
                             height:60px;
                             list-style: none;/*글씨 앞에 점 안보이게 함*/
-                            float:right;
+                            float:left;
                         }
                             .gnb a/*글씨와 링크*/
                             {
@@ -132,35 +147,36 @@
                             }
     </style>
     <script>
-            function isLoggedin()
+        function isLoggedin()
+        {
+            fetch('/validcheck/check2',{
+            method: 'GET',
+            credentials:'include',
+            })
+            .then(res=>
             {
-                fetch('/validcheck/check2',{
-                method: 'GET',
-                credentials:'include',
-                })
-                .then(res=>
+                return res.json();
+            })
+            .then(res=>
+            {
+                if(res.login)//로그인 되어있을시에 로그아웃 주소로 돌림
                 {
-                    return res.json();
-                })
-                .then(res=>
+                    document.getElementById('loginText').innerText="로그아웃";
+                    document.getElementById('sayhi').innerText=res.name+"님 안녕하세요!";
+                    $("#loginText").attr("href","/auth/logout");
+                }
+                else
                 {
-                    console.log(res);
-                    if(res)//로그인 되어있을시에 로그아웃 주소로 돌림
-                    {
-                        document.getElementById('loginText').innerText="로그아웃";
-                        $("#loginText").attr("href","/auth/logout");
-                    }
-                    else
-                    {
-                        document.getElementById('loginText').innerText="로그인";
-                        $("#loginText").attr("href","/login");
-                    }
-                })
-                .catch(err=>
-                {
-                    console.log(err);
-                });   
-            }
-            isLoggedin();
+                    document.getElementById('loginText').innerText="로그인";
+                    document.getElementById('sayhi').innerText="익명님 안녕하세요!";
+                    $("#loginText").attr("href","/login");
+                }
+            })
+            .catch(err=>
+            {
+                console.log(err);
+            });   
+        }
+        isLoggedin();
     </script>
 </html>

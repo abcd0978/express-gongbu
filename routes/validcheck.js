@@ -41,12 +41,11 @@ router.get('/check2',(req,res)=>//로그인여부
 {
     if(req.isAuthenticated())
     {
-        res.send(true);
+        res.send({login:true, name:req.user.name});//맞으면 로그인여부와 닉네임 반환
     }
     else
     {
         res.send(false);
     }
 });
-
 module.exports = router;
