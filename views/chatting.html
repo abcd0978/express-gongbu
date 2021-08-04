@@ -9,22 +9,267 @@
         <title>chatting</title>
     </head>
     <body>
-       <h1>welcome to chatting</h1>
-        
-    </body>
 
+        <div class="header">
+            <h1>
+                this is header
+            </h1>
+        </div>
+
+        <div class="wrapper" style="white-space: nowrap;">
+            <div class="rooms">
+                <h1>rooms</h1>
+                <button id="create_button" onclick="showform()">방만들기</button>
+            </div>
+    
+            <div class="chats" style="white-space: nowrap;">
+                <div class="chatbox" style="white-space: nowrap;">
+
+                </div>
+                <form action="/chat" class="chatform" method="post" enctype="multipart/form-data">
+
+                    <div class="filebox">
+                        <label id="filename" for="file">
+                            파일 업로드
+                        </label>
+                        <input type="file" id="file" name="file" accept=".jpeg, .jpg, .gif, .png" />
+                    </div>
+
+                    <input type="text" id="text" name="text">
+
+                    
+                    <button type="submit" id="button_submit">
+                        전송
+                    </button>
+
+                </form>
+            </div>
+        </div>
+    </body>
+    <style>
+        body
+        {
+            min-width: 650px;
+            min-height: 300px;
+            width:96%;
+            height:900px;
+        }
+    .wrapper
+    {
+        min-width: 770px;
+        width: 100%;
+        height: 85%;
+        /*border: 1px solid #003458;*/
+    }
+        .rooms
+        {
+            min-width: 190px;
+            width: 25%;
+            height:100%;
+            float: left;
+            box-sizing: border-box;
+            background: #8977ad;
+        }
+        .chats
+        {
+            min-width: 300px;
+            width: 75%;
+            height:100%;
+            float: right;
+            box-sizing: border-box;
+        }
+            .chatbox
+            {
+                border: 1px solid #003458;
+                width:100%;
+                height:96%;
+            }
+            .chatform
+            {
+                position: sticky;
+                width:100%;
+                height:4%;
+            }
+            .filebox
+            {
+                float:left;
+            }
+                .filebox label 
+                { 
+                    display: inline-block; 
+                    padding: .5em .75em; 
+                    color:darkseagreen;
+                    font-size: inherit; 
+                    line-height: normal; 
+                    vertical-align: middle; 
+                    background-color:aquamarine; 
+                    cursor: pointer; 
+                    border: 1px solid #ebebeb; 
+                    border-bottom-color: #e2e2e2; 
+                    border-radius: .25em; 
+                }
+                .filebox label:hover
+                {
+                    background-color:aqua;
+                }
+                .filebox input[type="file"] 
+                { 
+                    /* 파일 필드 숨기기 */ 
+                    position: absolute; 
+                    width: 1px; 
+                    height: 1px; 
+                    padding: 0; 
+                    margin: -1px; 
+                    overflow: hidden; 
+                    clip:rect(0,0,0,0); 
+                    border: 0; 
+                }
+            #text
+            {
+                min-width: 260px;
+                width:70%;
+                height:80%;
+                border: 3px solid black;
+            }
+            #button_submit
+            {
+                font-family: 'Pretendard-Regular';
+                border: 0;
+                font-size: large;
+                min-width: 30px;
+                width:10%;
+                height:97%;
+                background-color: rgb(209, 174, 127);
+                border: 1px rgb(189, 154, 17);;
+            }
+            #button_submit:hover
+            {
+                background-color:rgb(229, 194, 147);
+            }
+            @font-face 
+            {
+                font-family: 'Pretendard-Regular';
+                src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+                font-weight: 600;
+                font-style: normal;
+            }
+    </style>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io.connect("http://14.38.252.76:80",//80번포트->내 라즈베리파이로 포트포워딩 되어있음
+        function isLoggedin()
         {
-            path:'/socket.io',
-            transports:['websocket'],
-        });
-        socket.on('news',(data)=>
+            fetch('/validcheck/check2',{
+            method: 'GET',
+            credentials:'include',
+            })
+            .then(res=>
+            {
+                return res.json();
+            })
+            .then(res=>
+            {
+                if(res.login)
+                {
+                    console.log(res.name);
+                }
+                else
+                {
+                    console.log('익명');
+                }
+            })
+            .catch(err=>
+            {
+                console.log(err);
+            });   
+        }
+        isLoggedin();
+        function showform()
         {
-            console.log(data);
-            socket.emit('reply','hello world');
-        });
+            let room_wrap = document.getElementsByClassName("rooms")[0];
+            let create_room_button = document.getElementById('create_button');
+            create_room_button.style.display = "none";
+            
+            let bre = document.createElement("br");
+
+            let form = document.createElement("form");
+            form.setAttribute("method", "post");
+            form.setAttribute("action", "/createroom");
+            form.setAttribute("id","create_room_form")
+
+            let roomname = document.createElement("input");//방이름
+            roomname.setAttribute("type", "text");
+            roomname.setAttribute("name", "roomname");
+            roomname.setAttribute("placeholder", "방이름");
+
+            let max_people = document.createElement("select");//최대 수용인원
+            max_people.setAttribute("type", "text");
+            max_people.setAttribute("name", "max_people");
+            max_people.setAttribute("value", 2);
+            let opt2 = document.createElement("option");
+            let opt3 = document.createElement("option");
+            let opt4 = document.createElement("option");
+            let opt5 = document.createElement("option");
+            let opt6 = document.createElement("option");
+            let opt7 = document.createElement("option");
+            let opt8 = document.createElement("option");
+            opt2.value=2;opt3.value=3;opt4.value=4;opt5.value=5;opt6.value=6;opt7.value=7;opt8.value=8;
+            opt2.text="2명";opt3.text="3명";opt4.text="4명";opt5.text="5명";opt6.text="6명";opt7.text="7명";opt8.text="8명";
+            max_people.add(opt2);
+            max_people.add(opt3);
+            max_people.add(opt4);
+            max_people.add(opt5);
+            max_people.add(opt6);
+            max_people.add(opt7);
+            max_people.add(opt8);
+
+            let pass = document.createElement("input");//패스워드
+            pass.setAttribute("type", "text");
+            pass.setAttribute("name", "pass");
+            pass.setAttribute("placeholder", "비밀번호");
+
+            let submit_button = document.createElement("button");//제출
+            submit_button.setAttribute("type", "submit");
+            submit_button.setAttribute("name", "button_submit");
+            submit_button.innerHTML = "방만들기";
+
+            let hide_form= document.createElement("button");//닫기
+            hide_form.setAttribute("type", "button");
+            hide_form.setAttribute("name", "hide_form");
+            hide_form.setAttribute("onclick","hideform()");
+            hide_form.innerHTML="닫기";
+            
+            form.appendChild(roomname);
+            form.appendChild(bre.cloneNode());
+            form.appendChild(max_people);
+            form.appendChild(bre.cloneNode());
+            form.appendChild(pass);
+            form.appendChild(bre.cloneNode());
+            form.appendChild(submit_button);
+            form.appendChild(bre.cloneNode());
+            form.appendChild(hide_form);
+            room_wrap.appendChild(form);
+        }
+        function hideform()
+        {
+            let room_wrap = document.getElementsByClassName("rooms")[0];
+            room_wrap.removeChild(document.getElementById('create_room_form'));
+            document.getElementById('create_button').style.display = "";
+        }
+        function getRooms()//채팅 방 목록 가져오기
+        {
+            const socket = io.connect("http://14.38.252.76:80/room",//80번포트->내 라즈베리파이로 포트포워딩 되어있음
+            {
+                path:'/socket.io',
+                transports:['websocket'],
+            });
+            socket.on('newRoom',(data)=>
+            {
+                console.log(data);
+                //socket.emit('reply','hello world');
+            });
+        }
+
+        
 
     </script>
 </html>

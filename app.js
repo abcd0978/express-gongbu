@@ -27,7 +27,7 @@ sequelize.sync({force: false})//true로하면 모델 수정 가능, 단 데이�
     {
         console.log(err);
     });
-app.set('port',process.env.PORT||80);
+app.set('port',process.env.PORT);
 app.use(morgan('dev'));//모건 개발자 버전으로 로그남기기
 app.use(session({
     resave:false,
@@ -35,7 +35,7 @@ app.use(session({
     secret: process.env.SECRET,
     cookie:{
         httpOnly:true,
-        maxAge: 1000*60*30,//30분
+        maxAge: 1000*60*60,//30분
     },
     store: new MySqlStore({
         host: 'localhost',
@@ -62,7 +62,20 @@ app.use('/',(req,res,next)=>{
     }
 })
 */
-//app.use(express.static(__dirname+'/public'));
+
+app.use((req,res,next)=>
+{
+    console.log(req.session.color);
+
+    if(!req.session.color)
+    {
+        const ch = "#" + ((1<<24)*Math.random() | 0).toString(16);
+        req.session.color = ch;
+        console.log("생성된 임의16진수color:  "+ch);
+    }
+    next();
+})
+
 
 app.use('/',pagesRouter);
 app.use('/auth',authRouter);
@@ -78,4 +91,4 @@ const server = app.listen(app.get('port'),()=>
     console.log(app.get('port')+'번 포트에서 대기중');
 });
 
-Socket(server);
+Socket(server,app);

@@ -6,7 +6,7 @@
   src="https://code.jquery.com/jquery-3.6.0.js"
   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
   crossorigin="anonymous"></script>
-        <!--<link rel="stylesheet" href="./css/index.css">!-->
+        <link rel="stylesheet" href="./css/index.css">
         <title>6chan</title>
     </head>
     <body>
@@ -38,114 +38,25 @@
             </header>
 
             <div id="container">
-
+                <div>
+                    <h1>
+                        이부분은 container 입니다.
+                    </h1>
+                </div>
                 
 
             </div>
 
             <footer>
-                
+                <h1>
+                    이부분은 footer입니다.
+                </h1>
             </footer>
 
         </div>
         
         
     </body>
-    <style>
-        body, html
-        {
-            height:100%;
-        }
-            .wrapper
-            {
-                height:100%;
-                max-width:1200px;
-                margin: 0 auto;/*left right마진을 자동으로 함으로서 중앙정렬*/
-                
-            }
-                header
-                {
-                    background-image:url("images/main.jpg");
-                    height: 700px;
-                    position: fixied;
-                    width: 100%;/*wrapper의 1200px에 맞춤*/
-                    z-index: 9999;/*우선 순위가 높을수록 z축의 위에 배치된다*/
-                    top: 0;
-                }
-                    .logo
-                    {
-                        left:20px;
-                        width: 180px;
-                        float:left;
-                    }
-                    .name
-                    {
-                        opacity: 0.85;
-                        color:#454545;
-                        text-align: center;
-                        left:0;
-                        width:500px;
-                        float:left;
-                    }
-                    .gnb
-                    {
-                        width:100%;
-                        height:75px;
-                    }
-                        .gnb li/*글씨를 담는 영역*/
-                        {
-                            height:60px;
-                            list-style: none;/*글씨 앞에 점 안보이게 함*/
-                            float:left;
-                        }
-                            .gnb a/*글씨와 링크*/
-                            {
-                                opacity: 0.75;
-                                position:relative;
-                                font-family: 'Pretendard-Regular';
-                                font-size: large;
-                                color:white;
-                                text-decoration-line:none;/*밑줄 사라짐*/
-                                display: block;/*padding의 크기만큼 클릭하는 칸이 늘어남*/
-                                padding: 20px 30px;/*클릭하는칸이 차지하는 크기*/
-                                margin: 7px 7px;/*클릭하는 칸들의 간격*/
-                            }
-                            .gnb a:hover/*마우스가 올라갔을때*/
-                            {
-                                opacity: 1;
-                            }
-                            .gnb a::before 
-                            {
-                            transition: 300ms;/*애니메이션의 시간*/
-                            height: 5px;
-                            content: "";
-                            position: absolute;
-                            background-color:darkslategrey;
-                            }
-
-                            .fadeup::before 
-                            {
-                            position:absolute;
-                            left:25%;
-                            width: 55%;
-                            bottom: 5px;
-                            opacity: 0;
-                            }
-
-                            .fadeup:hover::before 
-                            {
-                            bottom: 10px;
-                            opacity: 0.86;
-                            }
-
-                            @font-face 
-                            {
-                                font-family: 'Pretendard-Regular';
-                                src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
-                                font-weight: 600;
-                                font-style: normal;
-                            }
-    </style>
     <script>
         function isLoggedin()
         {
