@@ -12,10 +12,11 @@ body, html
                 header
                 {
                     background-image:url("../images/main.jpg");
-                    height: 700px;
+                    height: 400px;
                     position: fixied;
                     width: 100%;/*wrapper의 1200px에 맞춤*/
                     z-index: 9999;/*우선 순위가 높을수록 z축의 위에 배치된다*/
+                    min-width:750px;
                     top: 0;
                 }
                     .logo
@@ -31,7 +32,8 @@ body, html
                         color:wheat;
                         text-align: center;
                         left:0;
-                        width:500px;
+                        width:30%;
+                        min-width:300px;
                         float:left;
                     }
                     .gnb
@@ -69,6 +71,55 @@ body, html
                             position: absolute;
                             background-color:darkslategrey;
                             }
+                .navnsearch
+                {
+                    border-bottom: 1px solid black;
+                    height:75px;
+                    width:100%;
+                    min-width: 787px;
+                }
+                    .lnb-left
+                    {
+                        width:50%;
+                        min-width: 430px;;
+                        float:left;
+                    }
+                        .lnb-left li/*글씨를 담는 영역*/
+                        {
+                            height:60px;
+                            margin-right: 3px;
+                            list-style: none;/*글씨 앞에 점 안보이게 함*/
+                            float:left;
+                            transition: 0.1s;
+                        }
+                        .lnb-left li:hover
+                        {
+                            background-color: darkgray;
+                        }
+                            .lnb-left a/*글씨와 링크*/
+                            {
+                                opacity: 0.75;
+                                position:relative;
+                                font-family: 'Pretendard-Regular';
+                                font-size: large;
+                                color:white;
+                                text-decoration-line:none;/*밑줄 사라짐*/
+                                display: block;/*padding의 크기만큼 클릭하는 칸이 늘어남*/
+                                padding: 20px 30px;/*클릭하는칸이 차지하는 크기*/
+                                margin: 7px 7px;/*클릭하는 칸들의 간격*/
+                            }
+                            .lnb-left a:hover/*마우스가 올라갔을때*/
+                            {
+                                opacity: 1;
+                            }
+                            .lnb-left a::before 
+                            {
+                            transition: 300ms;/*애니메이션의 시간*/
+                            height: 5px;
+                            content: "";
+                            position: absolute;
+                            background-color:darkslategrey;
+                            }
 
                             .fadeup::before 
                             {
@@ -84,7 +135,46 @@ body, html
                             bottom: 10px;
                             opacity: 0.86;
                             }
-
+                    .lnb-right
+                    {
+                        width:40%;
+                        float:right;
+                        height: 100%;
+                    }
+                        #searchInput
+                        {
+                            height: auto; /* 높이 초기화 */ 
+                            line-height: normal; /* line-height 초기화 */ 
+                            padding: .8em .5em; /* 여백 설정 */
+                            width:50%;
+                            margin-left: 10px;
+                            margin-top: 30px;
+                            margin-right: 10px;
+                        }
+                        #searchButton
+                        {
+                            font-family: 'Pretendard-Regular';
+                            height: 37px;
+                            color:#ffffff;
+                            font-size: medium;
+                            background-color:#0d6efd;
+                            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                            border: none;
+                            border-radius: 4px;
+                            display: inline-block;
+                            width: 70px;
+                            cursor:pointer;
+                            transition: 0.1s;
+                        }
+                        #searchButton:hover
+                        {
+                            background-color:#005edd;
+                        }
+                    .hotposts
+                    {
+                        float:center;
+                        background-color: aqua;
+                    }
                             @font-face 
                             {
                                 font-family: 'Pretendard-Regular';
