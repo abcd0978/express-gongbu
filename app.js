@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const morgan = require('morgan');
+const multer = require('multer');
 const dotenv = require('dotenv');
 const passport = require('passport');
 const MySqlStore = require('express-mysql-session')(session);
@@ -11,14 +12,15 @@ const pagesRouter = require('./routes/pages');
 const authRouter = require('./routes/auth');
 const validCheckRouter = require('./routes/validcheck');
 const Socket = require('./socket');
-const { sequelize } = require('./models');
+const models = require('./models/index');
+
 dotenv.config();
 
 
 const app = express();
 passportConfig();
 
-sequelize.sync({force: false})//true로하면 모델 수정 가능, 단 데이터 전부 지워짐.
+models.sequelize.sync({force: false, alter: false } )//true로하면 모델 수정 가능, 단 데이터 전부 지워짐.
     .then(()=>
     {
         console.log('db연결 성공');
@@ -29,7 +31,8 @@ sequelize.sync({force: false})//true로하면 모델 수정 가능, 단 데이�
     });
 app.set('port',process.env.PORT);
 app.use(morgan('dev'));//모건 개발자 버전으로 로그남기기
-app.use(session({
+
+const sessionMid = session({
     resave:false,
     saveUninitialized:false,
     secret: process.env.SECRET,
@@ -45,7 +48,8 @@ app.use(session({
         database: 'dcinside'
     }),
     //name:"connect.sid",//이걸로 초기화 되어있음
-}))
+});
+app.use(sessionMid);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -65,13 +69,15 @@ app.use('/',(req,res,next)=>{
 
 app.use((req,res,next)=>
 {
-    console.log(req.session.color);
-
     if(!req.session.color)
     {
         const ch = "#" + ((1<<24)*Math.random() | 0).toString(16);
         req.session.color = ch;
         console.log("생성된 임의16진수color:  "+ch);
+    }
+    else
+    {
+        console.log("생성된 임의16진수color:  "+req.session.color);
     }
     next();
 })
@@ -91,4 +97,4 @@ const server = app.listen(app.get('port'),()=>
     console.log(app.get('port')+'번 포트에서 대기중');
 });
 
-Socket(server,app);
+Socket(server,app,sessionMid);

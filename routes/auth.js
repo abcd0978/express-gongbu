@@ -7,7 +7,6 @@ const {isNotLoggedIn, isLoggedIn} = require('./middlewares');
 const router = express.Router();
 const Crypto = require('crypto');
 const bodyParser = require('body-parser');
-const Comment = require('../models/comment');
 
 router.use(express.json()); 
 router.use(express.urlencoded( {extended : true } ));
