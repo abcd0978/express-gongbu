@@ -1,4 +1,6 @@
 const SocketIO = require('socket.io');
+const fs = require('fs');
+const path = require('path');
 const Room = require('./models/room');
 const User = require('./models/user');
 module.exports = (server,app,sessionMid)=>//파라미터로 익스프레스 서버를 받는다.
@@ -8,7 +10,7 @@ module.exports = (server,app,sessionMid)=>//파라미터로 익스프레스 서�
     {           
         return await model.findAll({  attributes:['id','name','max','ispass','people'],  raw:true});
     }
-    const io = SocketIO(server,{path:'/socket.io'});
+    const io = SocketIO(server,{path:'/socket.io',maxHttpBufferSize: 1e6*5});
     app.set('io',io);
     const room =io.of('/room');
     const chat = io.of('/chat');
@@ -61,15 +63,16 @@ module.exports = (server,app,sessionMid)=>//파라미터로 익스프레스 서�
         {
             console.log("들어간방과 들어가려는방"+socket.room+" "+roomId);
             let flag = true;
-            if(socket.room===roomId)
+            if(socket.room)//들어가있던 방이 있다면
             {
-                socket.emit('error',"이미 들어간 방입니다.");
-                flag=false;
-            }
-            if(socket.room&&flag)
-            {
-                let temp = await Room.findOne({where:{id:socket.room}, raw:true});
-                socket.leave(socket.room);
+                if(socket.room===roomId)//이미 들어갔던 방과 들어가려는 방이 일치한다면
+                {
+                    socket.emit('error',"이미 들어간 방입니다.");
+                    return;//종료
+                }
+                let temp = await Room.findOne({where:{id:socket.room}, raw:true});//들어갔던 방의 정보를 불러옴
+                socket.broadcast.to(socket.room).emit('announce',{userdata:socket.who, message:"님이 나가셨습니다"});//먼저 나간다는 메세지를 뿌림
+                socket.leave(socket.room);//그리고 방을 나감
                 if((temp.people-1)<=0)//나갔는데 아무도 없을때
                 {
                     await Room.destroy({where:{id:temp.id}});
@@ -106,12 +109,22 @@ module.exports = (server,app,sessionMid)=>//파라미터로 익스프레스 서�
                 socket.emit('roomimin',roomId);//자기가 들어간 방번호를 리턴함: 같은방 다시 들어가는거 방지
             }
         })
-        socket.on('chat',(msg)=>
+        socket.on('chat',async (msg)=>
         {
-            let data = {userdata:socket.who , message:msg}// ex) data = {"userdata":{"user":"김민규","color":"#45f4ef"},"message":"hello"}
-            socket.broadcast.to(socket.room).emit('message',data);
-            data.me=1;
-            socket.emit('message',data);
+            if(msg.img==="1")//이미지라면
+            {
+                console.log("이미지들어옴");
+                const buffer = Buffer.from(msg.msg,'base64');//버퍼에 저장
+                socket.emit('message',{userdata:socket.who, message:{msg:buffer.toString('base64'),img:"1"},ex:msg.ex});
+                socket.broadcast.to(socket.room).emit('message',{userdata:socket.who, message:{msg:buffer.toString('base64'),img:"1"},ex:msg.ex});
+            }
+            else
+            {
+                let data = {userdata:socket.who , message:msg};
+                socket.broadcast.to(socket.room).emit('message',data);
+                data.me=1;
+                socket.emit('message',data);
+            }
         })
         socket.on('leaveRoom', async()=>
         {
@@ -132,9 +145,9 @@ module.exports = (server,app,sessionMid)=>//파라미터로 익스프레스 서�
             socket.room=null;
             socket.emit('getRooms',await getDB(Room));
         })
-        socket.on('disconnect',async ()=>
+        socket.on('disconnect',async (reason)=>
         {
-            console.log('접속해제',ip,socket.id);
+            console.log('접속해제',ip,socket.id+' reason: '+reason);
             if(socket.room)//어딘가에 들어가 있었다면
             {
                 let temp = await Room.findOne({where:{id:socket.room}, raw:true});
