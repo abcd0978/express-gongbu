@@ -1,5 +1,6 @@
 body, html
         {
+            background: linear-gradient(#2b1055,#7597de);
             height:100%;
         }
             .wrapper
@@ -92,10 +93,6 @@ body, html
                             float:left;
                             transition: 0.1s;
                         }
-                        .lnb-left li:hover
-                        {
-                            background-color: darkgray;
-                        }
                             .lnb-left a/*글씨와 링크*/
                             {
                                 opacity: 0.75;
@@ -149,7 +146,18 @@ body, html
                             width:50%;
                             margin-left: 10px;
                             margin-top: 30px;
-                            margin-right: 10px;
+                            margin-right: 10px;;
+                            background-color: transparent;
+                            border-top: transparent;
+                            border-left: transparent;
+                            border-right: transparent;
+                            border-bottom: 1px solid  black;
+                            transition: 0.2s;
+                        }
+                        #searchInput:focus
+                        {
+                            outline: none;
+                            border-bottom: none;
                         }
                         #searchButton
                         {

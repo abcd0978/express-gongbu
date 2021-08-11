@@ -25,7 +25,7 @@ router.route('/mypage').get((req,res,next)=>//마이페이지 페이지
 })
 router.route('/computersc').get((req,res,next)=>//컴퓨터사이언스 페이지
 {
-    res.sendFile(path.join(__dirname,'../views','mypage.html'));
+    res.sendFile(path.join(__dirname,'../views','computersc.html'));
 })
 router.route('/sfw').get((req,res,next)=>//SFW 페이지
 {

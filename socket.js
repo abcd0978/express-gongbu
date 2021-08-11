@@ -10,7 +10,7 @@ module.exports = (server,app,sessionMid)=>//파라미터로 익스프레스 서�
     {           
         return await model.findAll({  attributes:['id','name','max','ispass','people'],  raw:true});
     }
-    const io = SocketIO(server,{path:'/socket.io',maxHttpBufferSize: 1e6*5});
+    const io = SocketIO(server,{path:'/socket.io',maxHttpBufferSize: 1e7});
     app.set('io',io);
     const room =io.of('/room');
     const chat = io.of('/chat');
@@ -116,7 +116,9 @@ module.exports = (server,app,sessionMid)=>//파라미터로 익스프레스 서�
                 console.log("이미지들어옴");
                 const buffer = Buffer.from(msg.msg,'base64');//버퍼에 저장
                 socket.emit('message',{userdata:socket.who, message:{msg:buffer.toString('base64'),img:"1"},ex:msg.ex});
+                console.log('나한테보냄');
                 socket.broadcast.to(socket.room).emit('message',{userdata:socket.who, message:{msg:buffer.toString('base64'),img:"1"},ex:msg.ex});
+                console.log('브로드캐스트함');
             }
             else
             {

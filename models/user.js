@@ -27,10 +27,15 @@ module.exports = class User extends Sequelize.Model
                     type: Sequelize.STRING(50),
                     allowNull: true,
                 },
-                salt:
+                salt://솔트
                 {
                     type: Sequelize.STRING(300),
                     allowNull: false,
+                },
+                pic://프로필사진 이름
+                {
+                    type:Sequelize.STRING(200),
+                    allowNull:true,
                 },
                 user_id: //PK
                 {
@@ -49,7 +54,11 @@ module.exports = class User extends Sequelize.Model
                 tableName: 'users',//테이블명 즉 sql에서 쓰는이름 
                 charset: 'utf8',
                 collate: 'utf8_general_ci',
-            }
-        );
+            });
+    }
+    static associate(db)
+    {
+        db.User.hasMany(db.Comment,{foreignKey:'user_id', sourceKey:'user_id'});//유저가 comment를 많이 갖는다 (hasMany)
+        db.User.hasMany(db.Post,{foreignKey:'user_id', sourceKey:'user_id'});//유저가 post를 많이 갖는다 (hasMany)
     }
 }
