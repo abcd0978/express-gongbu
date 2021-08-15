@@ -41,7 +41,7 @@ module.exports = class Comment extends Sequelize.Model
             timestamps: true,//createdAt, createdAt row를 만들어줌.
             paranoid: true,//deletedAt일자 만들어줌(softdelete)
             modelName: 'Comment',//모델이름
-            tableName: 'comments',//테이블명 즉 sql에서 쓰는이름 
+            tableName: 'comments',//테이블명 즉 sql에서 쓰는이름
             charset: 'utf8',
             collate: 'utf8_general_ci',
         });

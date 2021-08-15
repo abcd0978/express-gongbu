@@ -8,8 +8,8 @@ const router = express.Router();
 const Crypto = require('crypto');
 const bodyParser = require('body-parser');
 
-router.use(express.json()); 
-router.use(express.urlencoded( {extended : true } ));
+router.use(express.json()); //bodyParser관련
+router.use(express.urlencoded( {extended : true } ));//bodyParser관련
 router.use(passport.initialize());
 router.use(passport.session());
 

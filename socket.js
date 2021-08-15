@@ -10,7 +10,7 @@ module.exports = (server,app,sessionMid)=>//파라미터로 익스프레스 서�
     {           
         return await model.findAll({  attributes:['id','name','max','ispass','people'],  raw:true});
     }
-    const io = SocketIO(server,{path:'/socket.io',maxHttpBufferSize: 1e7});
+    const io = SocketIO(server,{path:'/socket.io',maxHttpBufferSize: 1e7,pingInterval: 25000, pingTimeout: 60000,});
     app.set('io',io);
     const room =io.of('/room');
     const chat = io.of('/chat');

@@ -4,16 +4,18 @@ const morgan = require('morgan');
 const dotenv = require('dotenv');
 const passport = require('passport');
 const MySqlStore = require('express-mysql-session')(session);
-
 const passportConfig = require('./passport');
+const ejs = require('ejs');
+
 const pagesRouter = require('./routes/pages');
 const authRouter = require('./routes/auth');
 const validCheckRouter = require('./routes/validcheck');
+const boardRouter = require('./routes/board');
+
 const Socket = require('./socket');
 const models = require('./models/index');
 
 dotenv.config();
-
 
 const app = express();
 passportConfig();
@@ -28,6 +30,8 @@ models.sequelize.sync({force: false, alter: false } )//true로하면 모델 수�
         console.log(err);
     });
 app.set('port',process.env.PORT);
+app.set('views',__dirname+'/views');
+app.set('view engine','ejs');
 app.use(morgan('dev'));//모건 개발자 버전으로 로그남기기
 
 const sessionMid = session({
@@ -84,6 +88,7 @@ app.use((req,res,next)=>
 app.use('/',pagesRouter);
 app.use('/auth',authRouter);
 app.use('/validcheck',validCheckRouter);
+app.use('/board',boardRouter);
 
 app.use((req,res,next)=>
 {
