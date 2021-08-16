@@ -2,6 +2,65 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    await queryInterface.bulkInsert('comments', [
+      {
+        comment:'hello too',
+        password:'1234',
+        post_id: 1,
+        ip:'14.38.252.76',
+        who:'ㅇㅇ',
+        createdAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+        updatedAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      },
+      {
+        comment:'hello too2',
+        user_id: 4,
+        post_id: 1,
+        createdAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+        updatedAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      },
+      {
+        comment:'hello too2',
+        user_id: 4,
+        post_id: 1,
+        createdAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+        updatedAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      },
+      {
+        comment:'hello too2',
+        user_id: 4,
+        post_id: 1,
+        createdAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+        updatedAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      },
+      {
+        comment:'hello too3',
+        who:'ㅇㅇ',
+        ip:'14.38.252.76',
+        password:'1234',
+        post_id: 1,
+        createdAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+        updatedAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      },
+      {
+        comment:'hello too3',
+        who:'ㅇㅇ',
+        ip:'14.38.252.76',
+        password:'1234',
+        post_id: 1,
+        createdAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+        updatedAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      },
+      {
+        comment:'hello too3',
+        who:'ㅇㅇ',
+        ip:'14.38.252.76',
+        password:'1234',
+        post_id: 1,
+        createdAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''),
+        updatedAt: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '')
+      },
+    ])
      await queryInterface.bulkInsert('posts', [
     {
       title: 'hello',
@@ -422,5 +481,6 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.bulkDelete('posts', null, {});
+    await queryInterface.bulkDelete('comments', null, {});
   }
 };

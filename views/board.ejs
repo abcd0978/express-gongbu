@@ -54,7 +54,7 @@
                       <% var writer; %>
                       <% if(tabledata[i]['User.name']===null) { writer = tabledata[i].who+"("+tabledata[i].ip+")"%>
                       <% } else {writer = tabledata[i]['User.name']} %>
-                    <tr onClick = " location.href='http://14.38.252.76/board/view?no=<%= tabledata[i].post_id%>' ">
+                    <tr onClick = " location.href='http://14.38.252.76/board/view?id=<%= listquery %>&no=<%= tabledata[i].post_id%>' ">
                       <th scope="row"><%= tabledata[i].post_id %></th>
                       <td><% if(tabledata[i].isimg===1) { %> <img src="../ico/image.png" style="width:20px; height:20px;"> <% } %> %> <%= tabledata[i].title +' ['+tabledata[i].numOfCom+']' %> </td>
                       <td><%=  writer  %></td>
@@ -131,7 +131,7 @@
         }
         .wrapper
         {
-          width:70%;
+          width:90%;
           margin-left: auto; margin-right: auto;
         }
         #tableId

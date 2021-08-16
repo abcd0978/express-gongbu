@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+        <title><%= title %></title><!--query.id-->
+    </head>
+    <body>
+        
+        <div class = "wrapper">
+
+            <header>
+                <nav class="navbar navbar-light bg-light">
+                    <div class="container-fluid">
+                      <a class="navbar-brand" href="/">
+                        <img src="../../images/black-fag.png" alt="faggot" class="d-inline-block align-text-top">
+                      </a>
+    
+                      <div id="title">
+                        <h2>
+                          <a id="titlea" href="<%= hrefTitle %>" >
+                            <%= h2title %>
+                          </a>
+                        </h2>
+                      </div>
+                      <% if(update===true){ %>
+                        <div>
+                            <button class="btn btn-primary" alt="수정" onclick="goupdate('http://14.38.252.76/board/write?id=comps')">수정</button>
+                            <button class="btn btn-primary" alt="삭제" onclick="godelete('http://14.38.252.76/board/write?id=comps')">삭제</button>
+                        </div>
+                      <% } else if(update === "password") { %>
+                        <div>
+                            <button class="btn btn-primary" alt="수정" onclick="inputpass()">수정</button>
+                            <button class="btn btn-primary" alt="삭제" onclick="inputpass()">삭제</button>
+                        </div>
+                        <% } else { %>
+                            <div>
+                            </div>
+                            <div>
+                            </div>
+                        <%}%>
+                    </div>
+                  </nav>
+            </header>
+
+            <div id="container">
+
+                <div id="content" >
+                    <div id="informations">
+                        <!--제목 닉네임 작성일자 조회추 추천수 댓글수-->
+                        <h3 class="post_title">
+                            <%= post.title %>
+                        </h3>
+                        <div class="stats">
+                            <div id="fl"><!--이름 작성일자-->
+                                <span class="poster">
+                                    <% if(post['User.name']){%>
+                                        <%= post['User.name'] %>
+                                    <% } else{ %> 
+                                    <%=  post.who+'('+post.ip+')' %>
+                                    <% } %>
+                                    |
+                                </span>
+                                <span class="postdate">
+                                    <%= post.createdAt %>
+                                </span>
+                            </div>
+                            <div id="fr"><!--조회수 추천수 댓글수-->
+                                <span class="view">
+                                    조회:
+                                    <%= post.view %> |
+                                </span>
+                                <span class="thumsup">
+                                    추천:
+                                    <%= post.thmsup %> |
+                                </span>
+                                <span class="numberOfComments">
+                                    댓글:
+                                    <%= post.numOfCom %>
+                                </span>
+                            </div>
+                        </div>
+                        
+                    </div>
+    
+                    <div id="content_wrapper">
+                        <div id="text">
+                            <%= post.content %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="commentbox">
+                    <!--댓글 영역-->
+                    <ul class="cmt_list">
+                        <% for(let i=0;i<numOfCo;i++) { %>
+                            <% var deleteButtonFlag %>
+                            <% var Who; %>
+                            <% if(comment[i]['User.name']===null) { %>
+                            <%  Who = comment[i].who+'('+comment[i].ip+')'; %>
+                            <% } else { Who = comment[i]['User.name']; }%>
+                            <li id="comment_li <%= comment[i].id %>">
+                                <div class="commentdiv">
+                                    
+                                    <div id="whoAreYou">
+                                        <span id="nameipspan">
+                                            <%= Who %>
+                                        </span>
+                                    </div>
+
+                                    <div id="cmtcontent">
+                                        <%= comment[i].comment %>
+                                    </div>
+
+                                    <div id="timeNdelete">
+                                        <span id="time">
+                                            <%= comment[i].createdAt %>
+                                        </span>
+                                        <button id="button_cmt_delete" onclick="delete_cmt()">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                                <path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/>
+                                            </svg>
+                                        </button>
+
+                                    </div>
+                                </div>
+                            </li>
+                        <% } %>
+                    </ul>
+                    <!--댓글 영역-->
+                </div>
+
+                <div class="writebox">
+                    <% if(loginedName!==null) {%>
+                    <input type="text" id="NameInput" class="NameInput" readonly placeholder="<%= loginedName %>" style="cursor: default;">
+                    <% } else { %>
+                        <input type="text" id="NameInput" class="NameInput" placeholder="이름">
+                        <input type="password" id="passInput" class="passInput" placeholder="비밀번호">
+                    <%}%>
+                    <!--이름작성-->
+                    <!--비번작성-->
+                    <input type="text" id="cmtInput" class="cmtInput" placeholder="댓글 작성">
+                    <button type="submit" id="cmtButton" class="cmtButton"  onclick="addcomment()" >작성</button>
+                </div>
+
+            </div>
+
+            <footer>
+                
+            </footer>
+
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    </body>
+    <style>
+        body, html
+        {
+          width:100%;
+        }
+        #titlea
+        {
+          text-decoration-line: none;;
+        }
+        .wrapper
+        {
+          width:90%;
+          margin-left: auto; margin-right: auto;
+        }
+        .writebox
+        {
+            border: 1px solid black
+        }
+        #button_cmt_delete
+        {
+            background-color: transparent;
+            border: transparent;
+        }
+        ul{
+        list-style:none;
+        }
+        li
+        {
+            border-top: 1px solid #d0d0d0
+        }
+        li::after
+        {
+            display:block;
+            content:"";
+            clear:both;
+        }
+        #fl
+        {
+            float:left;
+        }
+        #fr
+        {
+            float:right;
+        }
+        #content_wrapper
+        {
+            margin-top: 50px;
+            min-height: 400px;
+        }
+        .stats::after
+        {
+            display:block;
+            content:"";
+            clear:both
+        }
+        #whoAreYou
+        {
+            float:left;
+        }
+        #cmtcontent
+        {
+            margin-left: 200px;
+            float:center;
+        }
+        #timeNdelete
+        {
+            float:right;
+        }
+
+    </style>
+
+</html>

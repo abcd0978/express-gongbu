@@ -32,7 +32,7 @@ module.exports = class User extends Sequelize.Model
                     type: Sequelize.STRING(300),
                     allowNull: false,
                 },
-                pic://프로필사진 이름
+                pic://프로필사진 경로
                 {
                     type:Sequelize.STRING(200),
                     allowNull:true,
