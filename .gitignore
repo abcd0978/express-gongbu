@@ -4,3 +4,4 @@ hs_ed25519_secret_key
 .env
 config/config.json
 bootstrap/
+postImages/
