@@ -233,7 +233,7 @@ function createRoom()//채팅 방 생성
     let roomname = document.getElementById("roomname").value;
     let max_people = document.getElementById("max_people").value;
     let pass = document.getElementById("pass").value;
-    let room = {name: roomname, max: max_people, password: pass};//jquery로 post요청할수 있게끔 추후에 고쳐야댐 
+    let room = {name: roomname, max: max_people, password: pass};//보안이슈 생길수도 있음
     if(roomname==="")
     {
         alert("방이름을 설정해주세요");

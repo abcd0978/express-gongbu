@@ -1,0 +1,135 @@
+body, html
+{
+  width:100%;
+}
+#titlea
+{
+  text-decoration-line: none;;
+}
+.wrapper
+{
+  width:90%;
+  margin-left: auto; margin-right: auto;
+}
+.writebox
+{
+    border: 1px solid black
+}
+.button_cmt_delete
+{
+    height:20px;
+    width:20px;
+    background-color: transparent;
+    border:transparent;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAANRJREFUOE+9lLEKwkAMhr8u4ujbOLuIg6Cio76gICo6iJOjq2/ipjhJoC1pyPVKOa5L4UK++3N/koLEX5GYR1bgCHgHKhiW518bDymcAntgB1xM0gA4APJfAh8d94ACOwOi4gdsFLSCzUvI3UI94AlYqFulrBXwAI7AzMQmwLM684CizEt8AWPnolusZInb0uzby1OsgWtXU9qgQZgktfVhSKU1qiEyBOxSsna/hmYxJXnb2MbWbnqNLT1bj2Bs9LZOa+jRa8BiLiddDr3XZNZ92EvlHzkwOhW2laVlAAAAAElFTkSuQmCC");
+}
+ul{
+list-style:none;
+}
+li
+{
+    border-top: 1px solid #d0d0d0
+}
+li::after
+{
+    display:block;
+    content:"";
+    clear:both;
+}
+#fl
+{
+    float:left;
+}
+#fr
+{
+    float:right;
+}
+.content_wrapper
+{
+    margin-top: 50px;
+    min-height: 400px;
+}
+.stats::after
+{
+    display:block;
+    content:"";
+    clear:both;
+}
+#whoAreYou
+{
+    float:left;
+}
+#cmtcontent
+{
+    margin-left: 200px;
+    float:center;
+    word-break:break-all;
+}
+#timeNdelete
+{
+    float:right;
+}
+.thumpsup
+{
+    width:300px;
+    margin: 0 auto 40px;
+    height: 120px;
+    border: 2px solid rgb(230, 230, 230);
+}
+.thumpsup::after
+{
+    display:block;
+    content:"";
+    clear:both
+}
+.inner
+{
+    margin-top: 30px;
+}
+.inner.fl
+{
+    width:130px;
+    float:left;
+}
+.inner.fr
+{
+    width:130px;
+    float:right;
+}
+.up_numbox, .down_numbox
+{
+    width:50px;
+    height: 60px;
+    text-align: center;
+}
+.up_numbox
+{
+    float:left;
+}
+.down_numbox
+{
+    float:right;
+}
+.button_up, .button_down
+{
+    background-color: transparent;
+    border:transparent;
+}
+.button_up
+{
+    float:right;
+}
+.font_red
+{
+    font-size: large;
+    text-align: center;
+    margin-top: 15px;
+    color:red;
+}
+.font_grey
+{
+    font-size: large;
+    text-align: center;
+    margin-top: 15px;
+    color:grey;
+}

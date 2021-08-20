@@ -6,6 +6,7 @@
   src="https://code.jquery.com/jquery-3.6.0.js"
   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
   crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="../css/posting.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
         <title><%= title %></title><!--query.id-->
     </head>
@@ -39,8 +40,8 @@
                         </div>
                         <% } else { %>
                             <div>
-                            </div>
-                            <div>
+                                <button style="cursor: default; border: transparent; background-color: transparent; color: transparent;" >ㅇㅇ</button>
+                                <button style="cursor: default; border: transparent; background-color: transparent; color: transparent;" >ㅇㅇ</button>
                             </div>
                         <%}%>
                     </div>
@@ -87,11 +88,37 @@
                         
                     </div>
     
-                    <div id="content_wrapper">
+                    <div class="content_wrapper">
                         <div id="text">
                             <%= post.content %>
                         </div>
                     </div>
+
+                    <!--추천 비추천-->
+                    <div class="thumpsup">
+                        
+                        <div class="inner fl">
+
+                            <div class="up_numbox">
+                                <p class="font_red" id="recomend">0</p>
+                            </div>
+
+                            <button class="button_up">
+                                <img src="../ico/gaechu-before.png">
+                            </button>
+                        </div>
+
+                        <div class="inner fr">
+                            <div class="down_numbox">
+                                <p class="font_grey" id="notrecomend">0</p>
+                            </div>
+                            <button class="button_down">
+                                <img src="../ico/bichu.png">
+                            </button>
+                        </div>
+
+                    </div>
+
                 </div>
 
                 <div class="commentbox">
@@ -116,15 +143,13 @@
                                         <%= comment[i].comment %>
                                     </div>
 
-                                    <div id="timeNdelete">
+                                    <div id="timeNdelete" re_no="<%= comment[i].id %>">
                                         <span id="time">
                                             <%= comment[i].createdAt %>
                                         </span>
-                                        <button id="button_cmt_delete" onclick="delete_cmt()">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
-                                                <path d="M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z"/>
-                                            </svg>
-                                        </button>
+                                        <% if(!comment[i].user_id || comment[i].user_id === user_id) {  %><!--댓글에 userid가 없거나 나의 userid와 일치한다면-->
+                                        <input type="button" class="button_cmt_delete">
+                                        <% } %>
 
                                     </div>
                                 </div>
@@ -157,75 +182,103 @@
         
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
     </body>
-    <style>
-        body, html
+    <script>
+        async function addcomment()//서버에서 한번더 체크함
         {
-          width:100%;
+            var cmt = document.getElementById('cmtInput').value;//댓글
+            var no = window.location.href.split('&')[1].split('=')[1];//게시글 번호
+            const loginFlag = async ()=> {
+                const res = await fetch('/validcheck/check2');
+                const data = await res.json();
+                return data.login;
+            }
+            const fetchComment = async(who,pass,cmt,loginFlag)=>
+            {
+                let data = 
+                {
+                    method: 'POST',
+                    headers:{
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({who:who, password:pass,comment:cmt,Flag:loginFlag,post_id:no})
+                };
+                const res = await fetch('/board/comment',data);
+                const resdata = await res.json();
+                return resdata;
+            }
+            if(await loginFlag())//로그인 했을시에
+            {
+                if(cmt===null || cmt==='')
+                {
+                    alert('댓글을 입력해주세요');
+                    return false;
+                }
+                let res = await fetchComment(null,null,cmt,loginFlag);
+                if(res)
+                {
+                    window.location.reload();
+                }
+                else
+                {
+                    alert('잘못된 접근입니다.');
+                }
+            }
+            else//로그인 안 했을 시에
+            {
+                let pass = document.getElementById('passInput').value;//비번
+                let name = document.getElementById('NameInput').value;//이름
+                if(cmt===null || cmt==='')
+                {
+                    alert('댓글을 입력해주세요');
+                    return false;
+                }
+                if(name===''||name===null||pass===''||pass===null)
+                {
+                    alert('이름또는 패스워드가 입력되지 않았습니다.');
+                    return false;
+                }
+                let res = await fetchComment(name,pass,cmt,loginFlag);
+                if(res)
+                {
+                    window.location.reload();
+                }
+                else
+                {
+                    alert('잘못된 접근입니다.');
+                }
+            }
         }
-        #titlea
+        /*댓글 지우기*/
+        var deleteButtons = document.getElementsByClassName('button_cmt_delete');
+        for(i=0;i<deleteButtons.length;i++)
         {
-          text-decoration-line: none;;
+            deleteButtons.item(i).addEventListener('click',async (e)=>
+            {
+                let password = prompt('패스워드를 입력해주세요');
+                let comment_num = e.target.parentElement.getAttribute('re_no');
+                if(password===null)
+                {
+                    return false;
+                }
+                let data = 
+                {
+                    method: 'POST',
+                    headers:{
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({comno: comment_num,pass:password})
+                };
+                const res = await fetch('/board/comment/delete_submit',data);
+                const resdata = await res.json();
+                if(resdata)
+                {
+                    window.location.reload();
+                }
+                else
+                {
+                    alert('비밀번호가 틀렸습니다');
+                }
+            })
         }
-        .wrapper
-        {
-          width:90%;
-          margin-left: auto; margin-right: auto;
-        }
-        .writebox
-        {
-            border: 1px solid black
-        }
-        #button_cmt_delete
-        {
-            background-color: transparent;
-            border: transparent;
-        }
-        ul{
-        list-style:none;
-        }
-        li
-        {
-            border-top: 1px solid #d0d0d0
-        }
-        li::after
-        {
-            display:block;
-            content:"";
-            clear:both;
-        }
-        #fl
-        {
-            float:left;
-        }
-        #fr
-        {
-            float:right;
-        }
-        #content_wrapper
-        {
-            margin-top: 50px;
-            min-height: 400px;
-        }
-        .stats::after
-        {
-            display:block;
-            content:"";
-            clear:both
-        }
-        #whoAreYou
-        {
-            float:left;
-        }
-        #cmtcontent
-        {
-            margin-left: 200px;
-            float:center;
-        }
-        #timeNdelete
-        {
-            float:right;
-        }
-
-    </style>
-
+    </script>
 </html>

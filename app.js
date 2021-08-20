@@ -5,7 +5,6 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 const MySqlStore = require('express-mysql-session')(session);
 const passportConfig = require('./passport');
-const ejs = require('ejs');
 
 const pagesRouter = require('./routes/pages');
 const authRouter = require('./routes/auth');
@@ -56,6 +55,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(express.static(__dirname+'/views'));
+app.use("/node_modules",express.static(__dirname+'/node_modules')); 
+app.use("/postImages",express.static(__dirname+'/postImages'));
 
 /* 이거쓰면 static파일을 세션을 받은사람만 볼수 있게 할수 있다.
 app.use('/',(req,res,next)=>{
@@ -75,11 +76,6 @@ app.use((req,res,next)=>
     {
         const ch = "#" + ((1<<24)*Math.random() | 0).toString(16);
         req.session.color = ch;
-        console.log("생성된 임의16진수color:  "+ch);
-    }
-    else
-    {
-        console.log("생성된 임의16진수color:  "+req.session.color);
     }
     next();
 })

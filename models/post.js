@@ -12,7 +12,7 @@ module.exports = class Post extends Sequelize.Model
             },
             content://글
             {
-                type:Sequelize.STRING(3000),
+                type:Sequelize.TEXT,
                 allowNull:false,
             },
             password://비밀번호

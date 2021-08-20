@@ -5,12 +5,34 @@ const User = require('../models/user');//유저 스키마
 const File = require('../models/file');//파일 스키마
 const Post = require('../models/post');//게시글 스키마
 const Comment = require('../models/comment');//댓글 스키마
+const fs = require('fs');
 const sequelize = require('sequelize');
 const router = express.Router();
 
 router.use(express.json()); //bodyParser관련(익스프레스 내장모듈)
 router.use(express.urlencoded( {extended : true } ));//bodyParser관련
 let lists = ['comps','sfw','nsfw'];//존재하는 게시판들
+const uploads = multer({
+    storage:multer.diskStorage({
+        destination(req,file,done)
+        {
+            done(null,'postImages/');
+        },
+        filename(req,file,done)
+        {
+            const ext = path.extname(file.originalname);
+            done(null,path.basename(file.originalname,ext)+Date.now()+ext);
+        }
+    }),
+    limits:{fileSize:1024*1024*10}
+});
+function cutIp(ip)
+{
+    let pos = 0;
+    let first = ip.indexOf('.',pos);
+    let second = ip.indexOf('.',first+1);
+    return ip.substring(0,second);
+}
 
 router.route('/lists').get(async (req,res,next)=>//게시판 페이지 확인
 {
@@ -57,7 +79,8 @@ router.route('/view').get(async (req,res,next)=>//글열람
     let postNumber = req.query.no;
     let listQ = req.query.id;
     let data = {};
-    let post =  await Post.findOne({where:{post_id:postNumber,wchboard:listQ},attributes:['title','content','ip','who','numOfCom','view','thmsup','thmsdwn','user_id',//게시글열람시 필요한 정보
+
+    let post =  await Post.findOne({where:{post_id:postNumber},attributes:['title','content','ip','who','numOfCom','view','thmsup','thmsdwn','user_id',//게시글열람시 필요한 정보
     [sequelize.fn('date_format', sequelize.col('Post.createdAt'),'%Y-%m-%d %H:%i:%S'), 'createdAt']], raw:true, 
         include:[
         {
@@ -66,12 +89,14 @@ router.route('/view').get(async (req,res,next)=>//글열람
         },
         ]
     });
+
+    await Post.increment({view: 1}, { where: { post_id:postNumber } })
+    //조회수++
     let comment = await Comment.findAll({where:{post_id:postNumber}, attributes:['id','comment','password','user_id','post_id','ip',
     'who',[sequelize.fn('date_format', sequelize.col('Comment.createdAt'),'%Y-%m-%d %H:%i:%S'), 'createdAt']], include:[{model:User,attributes:['name']}], raw:true});
+    //댓글 가져오기
     var realTitle = listQ==="comps"?realTitle="컴퓨터사이언스":realTitle=listQ;
-
-    
-
+    //타이틀
     data = {
         title:realTitle,/*페이지 타이틀*/listquery:listQ,//쿼리내용
         hrefTitle:"http://14.38.252.76/board/lists?id="+listQ,h2title:realTitle,//제목
@@ -84,14 +109,16 @@ router.route('/view').get(async (req,res,next)=>//글열람
         let viewer;
         if(req.session.passport===undefined)//사용자가 로그인을 안했으면 수정을 못함
         {
-            data.update = false;
-            data.loginedName = null;
+            data.update = false;//업데이트 가능여부
+            data.loginedName = null;//사용자의 닉네임
+            data.user_id = null;//사용자의 유저아이디
         }
-        else//로그인을 했다면
+        else//사용자가 로그인을 했다면
         {
             viewer = req.session.passport.user;
             let viewerName = await User.findOne({where:{user_id:viewer},raw:true});
             data.loginedName = viewerName.name; //사용자가 로그인 했다면 그 이름: 여기 중요하다///////////////////////////////////
+            data.user_id = viewer;
             if(viewer === post.user_id)//맞는 유저면 
             {
                 console.log('여기');
@@ -110,12 +137,14 @@ router.route('/view').get(async (req,res,next)=>//글열람
         if(req.session.passport===undefined)//사용자가 로그인을 안했으면 수정을 못함
         {
             data.loginedName = null;
+            data.user_id = null;
         }
-        else//로그인을 했다면
+        else//사용자가 로그인을 했다면
         {
             viewer = req.session.passport.user;
             let viewerName = await User.findOne({where:{user_id:viewer},raw:true});
             data.loginedName = viewerName.name; //사용자가 로그인 했다면 그 이름: 여기 중요하다///////////////////////////////////
+            data.user_id = viewer;
         }
     }
 
@@ -126,13 +155,121 @@ router.route('/view').get(async (req,res,next)=>//글열람
 
 router.route('/write').get((req,res,next)=>//글쓰기창에 들어감
 {
-    console.log(req.query.id);
-    res.send('hello this is write');
-})
-router.route('/write').post((req,res,next)=>//글쓰기 요청
-{
-    console.log(req.query.id);
-    res.send('hello this is write');
-})
+    let listQ = req.query.id;//리스트 
+    let realTitle;
+    realTitle = listQ==="comps"?realTitle="컴퓨터사이언스":realTitle=listQ;
 
+    let isloggedin;
+    isloggedin = req.session.passport===undefined ? isloggedin = false : isloggedin = req.session.passport.user;
+    let data = {h2title: realTitle , hrefTitle:"http://14.38.252.76/board/lists?id="+listQ ,islogged:isloggedin}
+    res.render('writing',data);
+});
+router.route('/write').post(async(req,res,next)=>//글쓰기 요청
+{
+    let title = req.body.title;//글제목
+    let who = req.body.author;//작성자
+    let pass = req.body.password;//비밀번호
+    let isimg = req.body.isImage;//이미지 존재여부
+    let wchboard = req.body.wchboard;//어느 게시판에 속하는지
+    let content = req.body.content;//게시글
+    let lastcolon = req.socket.remoteAddress.lastIndexOf(":");
+    let ip = req.socket.remoteAddress.substring(lastcolon+1,req.socket.remoteAddress.length);//ipv6->ipv4
+    let cuttedIp = cutIp(ip);//ipv6->ipv4 디씨식으로 앞에 두자리만 보임
+    let userId;
+    if(req.session.passport)
+    {
+        userId = req.session.passport.id;
+    }
+    console.log(title,who,pass,isimg,wchboard,cuttedIp,userId,content);
+});
+router.route('/uploads').post(uploads.single('upload'),(req,res,next)=>//사진 업로드
+{
+    let tempImage = req.file.path;
+    let extlength = tempImage.lastIndexOf('.');
+    let ext = tempImage.substring(extlength+1,tempImage.length);
+    console.log(ext);
+    let picexts =['jpg','jpeg','png','gif','svg','jfif'];
+    if(picexts.indexOf(ext)>0)//사진이면 ok사인 보냄
+    {
+        res.status(200).json({
+            uploaded:true,
+            url:`../${tempImage}`
+        });
+    }
+    else
+    {
+        res.status(400)
+        fs.unlink(path.join(__dirname,`../postImages/${imageName}`),(err)=>{
+            console.log(err);
+        })
+    }
+});
+/* router.route('/uploads/Image2').post(uploads.single('upload'),(req,res,next)=>//사진 삭제
+{
+    let imageName = req.body.imageName;
+    fs.unlink(path.join(__dirname,`../postImages/${imageName}`),(err)=>{
+        console.log(err);
+    })
+}); */
+
+router.route('/comment').post(async (req,res,next)=>//댓글
+{
+    let islogged = req.session.passport===undefined ? false : true;
+    let loginFlag = req.body.Flag;
+
+    let no = req.body.post_id;//게시글의 post_id
+    let cmt = req.body.comment;//댓글 문자열
+
+    let data = {
+        post_id:no,
+        comment:cmt,
+    }
+
+    if(loginFlag)
+    {
+        if(!islogged)//loginflag는 있는데 passport를 부여받지 않은경우
+        {
+            res.send(false);
+        }
+        //passport도 부여받고 loginFlag도 true인 경우
+        data.user_id = req.session.passport.id
+        await Comment.create(data);
+        res.send(true);
+    }
+    else//로그인 하지 않은경우
+    {
+        let namedata = req.body.who;
+        let passworddata = req.body.password;
+        data.who = namedata;//이름
+        data.password = passworddata;//비밀번호
+        if(namedata===''||namedata===null||passworddata===''||passworddata===null)
+        {
+            res.send(false);
+        }
+        let lastcolon = req.socket.remoteAddress.lastIndexOf(":");
+        let ip = req.socket.remoteAddress.substring(lastcolon+1,req.socket.remoteAddress.length);//ipv6->ipv4
+        let cuttedIp = cutIp(ip);
+        data.ip = cuttedIp;
+        await Comment.create(data);
+        res.send(true);
+    }
+});
+router.route('/comment/delete_submit').post(async (req,res,next)=>//댓글삭제
+{
+    let commentId = req.body.comno;
+    let commentPassword = req.body.pass;
+    const response = await Comment.destroy({where:{id:commentId,password:commentPassword}});
+    if(response)
+    {
+        res.send(true);
+    }
+    else
+    {
+        res.send(false);
+    }
+});
+router.route('/gaechubichu').post(async (req,res,next)=>//추천,비추
+{
+
+});
 module.exports = router;
