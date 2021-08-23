@@ -11,7 +11,6 @@
         <title>글쓰기</title>
     </head>
     <body>
-        
         <div class = "wrapper">
 
             <header>
@@ -114,13 +113,55 @@
       var author = document.getElementById('authorInput');
       var password = document.getElementById('passwordInput');
       var submit = document.getElementById('submitButton');
+      var isuploading = true;
       ClassicEditor
           .create( document.querySelector( '#editor' ),
           {
             ckfinder:
             {
               uploadUrl:"http://14.38.252.76/board/uploads"
-            }
+            },
+            toolbar:
+            {
+              items:
+              [
+                    'heading',
+                    '|',
+                    'fontSize',
+                    'fontFamily',
+                    'fontColor',
+                    'fontBackgroundColor',
+                    '|',
+                    'bold',
+                    'italic',
+                    'underline',
+                    'horizontalLine',
+                    'strikethrough',
+                    'highlight',
+                    '|',
+                    'alignment',
+                    '|',
+                    'numberedList',
+                    'bulletedList',
+                    '|',
+                    'indent',
+                    'outdent',
+                    '|',
+                    'link',
+                    'blockQuote',
+                    'imageUpload',
+                    'insertTable',
+                    'mediaEmbed',
+                    'codeBlock',
+                    'subscript',
+                    'superscript',
+                    'specialCharacters',
+                    'findAndReplace',
+                    '|',
+                    'undo',
+                    'redo',
+              ]
+            },
           })
           .then((editor) => {
             submit.addEventListener('click',async (e)=>
@@ -131,12 +172,22 @@
               let passwordVal = null;
               let wchboard = window.location.href.split('=')[1];
               let content = editor.getData();
-              console.log(content);d
               let isImage;
-              if(author!==null && password!==null)
+              if(author!==null && password!==null)//작성자입력과 패스워드 입력이 있는지(서버에서 한번더 검사함)
               {
+                console.log('ㅎㅇㅎㅇ');
                 authorVal = author.value;
                 passwordVal = password.value;
+                if(authorVal==='')
+                {
+                  alert('닉네임이 입력되지 않았습니다');
+                  return false;
+                }
+                if(passwordVal==='')
+                {
+                  alert('패스워드가 입력되지 않았습니다');
+                  return false;
+                }
               }
               editor.getData().indexOf('<img') < 0 ? isImage = false : isImage = true;
               let data = 
@@ -156,7 +207,11 @@
                         })
                   };
               let res = await fetch('/board/write',data);
-              let resData = res.json();
+              let resData = await res.json();
+              if(resData)
+              {
+                window.location.href = "<%= hrefTitle %>";
+              }
             })
 
             /* const model = editor.model;

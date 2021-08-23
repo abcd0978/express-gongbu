@@ -12,7 +12,8 @@ const router = express.Router();
 router.use(express.json()); //bodyParser관련(익스프레스 내장모듈)
 router.use(express.urlencoded( {extended : true } ));//bodyParser관련
 let lists = ['comps','sfw','nsfw'];//존재하는 게시판들
-const uploads = multer({
+
+const imageUpload = multer({
     storage:multer.diskStorage({
         destination(req,file,done)
         {
@@ -24,7 +25,7 @@ const uploads = multer({
             done(null,path.basename(file.originalname,ext)+Date.now()+ext);
         }
     }),
-    limits:{fileSize:1024*1024*10}
+    limits:{fileSize:1024*1024*5}
 });
 function cutIp(ip)
 {
@@ -168,7 +169,7 @@ router.route('/write').post(async(req,res,next)=>//글쓰기 요청
 {
     let title = req.body.title;//글제목
     let who = req.body.author;//작성자
-    let pass = req.body.password;//비밀번호
+    let password = req.body.password;//비밀번호
     let isimg = req.body.isImage;//이미지 존재여부
     let wchboard = req.body.wchboard;//어느 게시판에 속하는지
     let content = req.body.content;//게시글
@@ -178,18 +179,38 @@ router.route('/write').post(async(req,res,next)=>//글쓰기 요청
     let userId;
     if(req.session.passport)
     {
-        userId = req.session.passport.id;
+        userId = req.session.passport.user;
     }
-    console.log(title,who,pass,isimg,wchboard,cuttedIp,userId,content);
+    else//로그인 안했는데 비번이랑 닉네임 둘중하나 안적혀있으면
+    {
+        userId = null;
+        if(password===null || who===null)
+        {
+            res.send("잘못된 접근입니다.");
+        }
+    }
+    let data = {
+        title:title,
+        who:who,
+        password: password,
+        isimg:isimg,
+        wchboard:wchboard,
+        content:content,
+        ip:cuttedIp,
+        user_id:userId
+    }
+    await Post.create(data);
+    res.send(true);
 });
-router.route('/uploads').post(uploads.single('upload'),(req,res,next)=>//사진 업로드
+router.route('/uploads').post(imageUpload.single('upload'),(req,res,next)=>//사진 업로드
 {
     let tempImage = req.file.path;
     let extlength = tempImage.lastIndexOf('.');
     let ext = tempImage.substring(extlength+1,tempImage.length);
-    console.log(ext);
-    let picexts =['jpg','jpeg','png','gif','svg','jfif'];
-    if(picexts.indexOf(ext)>0)//사진이면 ok사인 보냄
+    console.log("확장자: "+ext);
+    let picexts =['jpg','jpeg','png','gif','svg','jfif','webp'];
+    console.log(picexts.indexOf(ext));
+    if(picexts.indexOf(ext)>-1)//사진이면 ok사인 보냄
     {
         res.status(200).json({
             uploaded:true,
@@ -198,13 +219,17 @@ router.route('/uploads').post(uploads.single('upload'),(req,res,next)=>//사진 
     }
     else
     {
-        res.status(400)
-        fs.unlink(path.join(__dirname,`../postImages/${imageName}`),(err)=>{
+        console.log('안댔음');
+        res.status(400).json({
+            uploaded:false,
+        });
+        console.log(__dirname);
+        fs.unlink(path.join(__dirname,`../${tempImage}`),(err)=>{//이미지 삭제
             console.log(err);
         })
     }
 });
-/* router.route('/uploads/Image2').post(uploads.single('upload'),(req,res,next)=>//사진 삭제
+/* router.route('/uploads/Image2').post(upload.single('upload'),(req,res,next)=>//에디터에서 사진 지울시 사진 삭제
 {
     let imageName = req.body.imageName;
     fs.unlink(path.join(__dirname,`../postImages/${imageName}`),(err)=>{
@@ -234,6 +259,7 @@ router.route('/comment').post(async (req,res,next)=>//댓글
         //passport도 부여받고 loginFlag도 true인 경우
         data.user_id = req.session.passport.id
         await Comment.create(data);
+        await Post.increment({numOfCom: 1}, { where: { post_id:no } });
         res.send(true);
     }
     else//로그인 하지 않은경우
@@ -248,9 +274,10 @@ router.route('/comment').post(async (req,res,next)=>//댓글
         }
         let lastcolon = req.socket.remoteAddress.lastIndexOf(":");
         let ip = req.socket.remoteAddress.substring(lastcolon+1,req.socket.remoteAddress.length);//ipv6->ipv4
-        let cuttedIp = cutIp(ip);
+        let cuttedIp = cutIp(ip);//디시식으로 앞에 두자리만 
         data.ip = cuttedIp;
         await Comment.create(data);
+        await Post.increment({numOfCom: 1}, { where: { post_id:no } });
         res.send(true);
     }
 });

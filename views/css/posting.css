@@ -8,7 +8,7 @@ body, html
 }
 .wrapper
 {
-  width:90%;
+  width:85%;
   margin-left: auto; margin-right: auto;
 }
 .writebox
@@ -48,6 +48,8 @@ li::after
 {
     margin-top: 50px;
     min-height: 400px;
+    max-width: 100%;
+    word-break: break-all;
 }
 .stats::after
 {
@@ -132,4 +134,9 @@ li::after
     text-align: center;
     margin-top: 15px;
     color:grey;
+}
+figure > img
+{
+  max-width: 55%;
+  object-fit: scale-down;
 }

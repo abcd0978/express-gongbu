@@ -27,10 +27,10 @@ module.exports = class Post extends Sequelize.Model
             },
             post_id://게시글 아이디
             {
-                type:Sequelize.INTEGER,
-                unique:true,
-                primaryKey:true,
-                autoIncrement:true,
+                allowNull: false,
+                autoIncrement: true,
+                primaryKey: true,
+                type: Sequelize.INTEGER
             },
             ip://아이피
             {
@@ -49,7 +49,7 @@ module.exports = class Post extends Sequelize.Model
             },
             isimg://이미지가 있는 게시물인지 확인하는 컬럼
             {
-                type: Sequelize.INTEGER,
+                type: Sequelize.BOOLEAN,
                 allowNull:false,//확인하자
             },
             view://조회수
@@ -86,7 +86,7 @@ module.exports = class Post extends Sequelize.Model
     }
     static associate(db)
     {
-        db.Post.belongsTo(db.User,{foreignKey:'user_id', sourceKey:'user_id'});//Post는 User에 속한다.
+        db.Post.belongsTo(db.User,{foreignKey:'user_id', sourceKey:'user_id',onDelete:'cascade'});//Post는 User에 속한다.
         db.Post.hasMany(db.Comment,{foreignKey:'post_id',sourceKey:'post_id'});
     }
 }

@@ -48,7 +48,7 @@ module.exports = class Comment extends Sequelize.Model
     }
     static associate(db)
     {
-        db.Comment.belongsTo(db.User,{foreignKey:'user_id', sourceKey:'user_id'});//comment는 User에 속한다.
-        db.Comment.belongsTo(db.Post,{foreignKey:'post_id', sourceKey:'post_id'});//comment는 post에 속한다.
+        db.Comment.belongsTo(db.User,{foreignKey:'user_id', sourceKey:'user_id',onDelete:'cascade'});//comment는 User에 속한다.
+        db.Comment.belongsTo(db.Post,{foreignKey:'post_id', sourceKey:'post_id',onDelete:'cascade'});//comment는 post에 속한다.
     }
 }
