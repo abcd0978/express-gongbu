@@ -54,9 +54,9 @@
                       <% var writer; %>
                       <% if(tabledata[i]['User.name']===null) { writer = tabledata[i].who+"("+tabledata[i].ip+")"%>
                       <% } else {writer = tabledata[i]['User.name']} %>
-                    <tr onClick = " location.href='http://14.38.252.76/board/view?id=<%= listquery %>&no=<%= tabledata[i].post_id%>' ">
+                    <tr>
                       <th scope="row"><%= tabledata[i].post_id %></th>
-                      <td><% if(tabledata[i].isimg===1) { %> <img src="../ico/image.png" style="width:20px; height:20px;"> <% } %> %> <%= tabledata[i].title +' ['+tabledata[i].numOfCom+']' %> </td>
+                      <td><% if(tabledata[i].isimg===1) { %> <img src="../ico/image.png" style="width:20px; height:20px;"> <% } %> %> <a href="/board/view?id=<%= listquery %>&no=<%= tabledata[i].post_id%>"><%= tabledata[i].title +' ['+tabledata[i].numOfCom+']' %></a> </td>
                       <td><%=  writer  %></td>
                       <td><%= tabledata[i].view %> </td>
                       <td><%= tabledata[i].thmsup %> </td>
@@ -71,7 +71,7 @@
                   <div class="d-flex justify-content-center">
                     <nav class="pagenav">
                       <ul class="pagination">
-                        <% var numOfPage = Math.ceil(wholepage/limitStatic); console.log(numOfPage,wholepage,limitStatic)%> <!--전체 페이지의 수 -->
+                        <% var numOfPage = Math.ceil(wholepage/limitStatic);%> <!--전체 페이지의 수 -->
                         <% var firstpage;%> <!-- 보여질 페이지의 첫번째 숫자  -->
                         <% if(curpage-5>0) { %>
                         <% if(curpage%5===0){%>
@@ -80,8 +80,8 @@
                         <% } else{ firstpage = 1 } %>
 
                         <% var pages;%> <!-- 보여질 페이지의 끝 숫자  -->
-                        <% if(parseInt(curpage)===numOfPage){ console.log('hello');pages=numOfPage;} else{pages = firstpage+4;} %>
-                        <% if(pages>numOfPage){pages = numOfPage} console.log(firstpage,pages) %>
+                        <% if(parseInt(curpage)===numOfPage){pages=numOfPage;} else{pages = firstpage+4;} %>
+                        <% if(pages>numOfPage){pages = numOfPage}%>
 
                         <% var prevpage; %>
                         <% var nextpage; %>
@@ -137,9 +137,9 @@
           width:90%;
           margin-left: auto; margin-right: auto;
         }
-        #tableId
-        {
-            cursor: pointer;
+        td > a:visited {
+        color: #58595b;
+        text-decoration: none;
         }
     </style>
 

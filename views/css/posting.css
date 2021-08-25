@@ -15,6 +15,10 @@ body, html
 {
     border: 1px solid black
 }
+.container-fluid
+{
+    position:relative;
+}
 .button_cmt_delete
 {
     height:20px;

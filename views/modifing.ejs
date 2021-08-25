@@ -8,7 +8,7 @@
   crossorigin="anonymous"></script>
   <script type="text/javascript" src="../node_modules/@ckeditor/ckeditor5-build-classic/build/ckeditor.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-        <title>글쓰기</title>
+        <title>수정하기</title>
     </head>
     <body>
         <div class = "wrapper">
@@ -40,32 +40,45 @@
 
             <div id="container">
 
+
+            <% if(isLogedPost) { %>
               <form class="writingform">
 
               <h3>
                 제목
               </h3>
-              <input type="text" class="form-control" id="titleInput" placeholder="제목">
+              <input type="text" class="form-control" id="titleInput" value="<%= title %>">
               <% if(islogged===false || islogged===undefined) { %>
               <h3>
                 작성자
               </h3>
-              <input type="text" class="form-control" id="authorInput" placeholder="작성자">
+              <input type="text" class="form-control" id="authorInput" value="<%= author %>" readonly>
               
               <h3>
                 비밀번호
               </h3>
-              <input type="password" class="form-control" id="passwordInput" placeholder="비밀번호">
+              <input type="password" class="form-control" id="passwordInput" value="*******" readonly>
               <!-- <p>※이미지를 지울시에 undo할수 없습니다. 에디터에 다시 올려주세요</p> -->
               <% } %>
               <div id="editor">
-
+                <%- content %>
               </div>
 
               <button class="btn btn-primary" id="submitButton">제출</button>
-            </form>
+              </form>
+            <% } else { %>
+              <form class="passform" action="/board/modify" method="post" id="passform">
+                <div class="form-group">
+                  <h3>
+                    비밀번호
+                  </h3>
+                  <input type="password" class="form-control" id="anoPasswordInput" name="pass">
+                  <button type="submit" class="btn btn-primary" id="anoPassSubmitButton">제출</button>
+                </div>
+              </form>
+            <% } %>
 
-            
+
             </div>
 
             <footer>
@@ -107,13 +120,12 @@
       {
         min-height: 500px;
       }
+      #anoPasswordInput
+      {
+        max-width: 400px;
+      }
     </style>
     <script>
-      var title = document.getElementById('titleInput');
-      var author = document.getElementById('authorInput');
-      var password = document.getElementById('passwordInput');
-      var submit = document.getElementById('submitButton');
-      var isuploading = true;
       ClassicEditor
           .create( document.querySelector( '#editor' ),
           {
@@ -170,27 +182,13 @@
             submit.addEventListener('click',async (e)=>
             {
               e.preventDefault();
+              var title = document.getElementById('titleInput');
+              var submit = document.getElementById('submitButton');
               let titleVal = title.value;
-              let authorVal = null;
               let passwordVal = null;
-              let wchboard = window.location.href.split('=')[1];
               let content = editor.getData();
               let isImage;
-              if(author!==null && password!==null)//작성자입력과 패스워드 입력이 있는지(서버에서 한번더 검사함)
-              {
-                authorVal = author.value;
-                passwordVal = password.value;
-                if(authorVal==='')
-                {
-                  alert('닉네임이 입력되지 않았습니다');
-                  return false;
-                }
-                if(passwordVal==='')
-                {
-                  alert('패스워드가 입력되지 않았습니다');
-                  return false;
-                }
-              }
+              let no = '<%=postId%>';
               editor.getData().indexOf('<img') < 0 ? isImage = false : isImage = true;
               let data = 
                   {
@@ -200,15 +198,13 @@
                       },
                       body: JSON.stringify(
                         {
-                          title:titleVal, 
-                          author: authorVal, 
-                          password: passwordVal,
+                          title:titleVal,
                           isImage:isImage,
-                          wchboard:wchboard,
-                          content:content
+                          content:content,
+                          no:parseInt(no),
                         })
                   };
-              let res = await fetch('/board/write',data);
+              let res = await fetch('/board/modify/submit',data);
               let resData = await res.json();
               if(resData)
               {
@@ -243,5 +239,53 @@
           .catch( error => {
             console.error( 'There was a problem initializing the editor.', error );
           } );
+          
+          function addform()
+          {
+            let passform = document.getElementById('passform');
+            let input = document.createElement('input');
+            input.type='hidden';
+            input.name='no';
+            input.id='no';
+            input.value=window.location.href.split('?')[1].split('&')[1].split('=')[1];
+            passform.appendChild(input);
+            let input2 = document.createElement('input');
+            input2.type='hidden';
+            input2.name='list';
+            input2.id='list';
+            input2.value=window.location.href.split('?')[1].split('&')[0].split('=')[1];
+            passform.appendChild(input2);
+          }
+          addform();
+          /*
+          document.getElementById('anoPassSubmitButton').addEventListener('click',async (e)=>
+          {
+            e.preventDefault();
+            let pass = document.getElementById('anoPasswordInput').value;
+            console.log(pass);
+            let res = await fetch('/board/modify',{
+                      method: 'POST',
+                      headers:{
+                          'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify(
+                        {
+                          pass:pass,
+                          no:window.location.href.split('?')[1].split('&')[1].split('=')[1],
+                          list:value=window.location.href.split('?')[1].split('&')[0].split('=')[1]
+                        })
+                  })
+              let resDataH = await res.text();
+              if(resDataH==='false')
+              {
+                alert('비밀번호가 틀립니다');
+              }
+              else
+              {
+                $('html').html(resDataH);
+              }
+          });
+          */
+
   </script>
 </html>

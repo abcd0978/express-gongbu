@@ -8,6 +8,7 @@
   crossorigin="anonymous"></script>
   <link rel="stylesheet" href="../css/posting.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+  <script async charset="utf-8" src="//cdn.embedly.com/widgets/platform.js"></script>
         <title><%= title %></title><!--query.id-->
     </head>
     <body>
@@ -28,15 +29,15 @@
                           </a>
                         </h2>
                       </div>
-                      <% if(update===true){ %>
+                      <% if(update===true){ %> <!--업데이트 가능여부-->
                         <div>
-                            <button class="btn btn-primary" alt="수정" onclick="goupdate('http://14.38.252.76/board/write?id=comps')">수정</button>
-                            <button class="btn btn-primary" alt="삭제" onclick="godelete('http://14.38.252.76/board/write?id=comps')">삭제</button>
+                            <button class="btn btn-primary" alt="수정" onclick="goUpdate('http://14.38.252.76/board/modify?id=<%=listquery%>&no=<%=postquery%>')">수정</button>
+                            <button class="btn btn-primary" alt="삭제" onclick="goDelete('http://14.38.252.76/board/delete')">삭제</button>
                         </div>
                       <% } else if(update === "password") { %>
                         <div>
-                            <button class="btn btn-primary" alt="수정" onclick="inputpass()">수정</button>
-                            <button class="btn btn-primary" alt="삭제" onclick="inputpass()">삭제</button>
+                            <button class="btn btn-primary" alt="수정" onclick="goUpdate('http://14.38.252.76/board/modify?id=<%=listquery%>&no=<%=postquery%>')">수정</button>
+                            <button class="btn btn-primary" alt="삭제" onclick="goDelete('http://14.38.252.76/board/delete')">삭제</button>
                         </div>
                         <% } else { %>
                             <div>
@@ -177,14 +178,14 @@
             </footer>
 
         </div>
-        
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
     </body>
+        
     <script>
+        var no = window.location.href.split('&')[1].split('=')[1];//게시글 번호
         async function addcomment()//서버에서 한번더 체크함
         {
             var cmt = document.getElementById('cmtInput').value;//댓글
-            var no = window.location.href.split('&')[1].split('=')[1];//게시글 번호
             const loginFlag = async ()=> {
                 const res = await fetch('/validcheck/check2');
                 const data = await res.json();
@@ -264,12 +265,13 @@
                     headers:{
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({comno: comment_num,pass:password})
+                    body: JSON.stringify({comno: comment_num,pass:password,post_id:no})
                 };
                 const res = await fetch('/board/comment/delete_submit',data);
                 const resdata = await res.json();
                 if(resdata)
                 {
+                    console.log('댓글을 지웁니다');
                     window.location.reload();
                 }
                 else
@@ -277,6 +279,101 @@
                     alert('비밀번호가 틀렸습니다');
                 }
             })
+        }
+        $(document).ready(function() {
+            document.querySelectorAll('oembed[url]').forEach((e)=>
+            {
+                const mediaUrl = e.getAttribute('url');
+                var request = null;
+                let query = {url:mediaUrl};
+                query['maxwidth']=650;
+                query['maxheight']=500;
+                query['nowrap'] = "on";
+                if (request && request.transport) request.transport.abort();
+                let res = $.ajax({
+                    url:'https://noembed.com/embed?url='+mediaUrl,
+                    type:'GET',
+                    data:query,
+                    dataType:'json',
+                    success: function(res){
+                        if(res.html)
+                        {
+                        $('.media').html(res.html);
+                        }
+                    }
+                });
+            });
+        });
+        async function goUpdate(url)
+        {
+            window.location.href = url;
+        }
+        async function goDelete(url)
+        {
+            let postId = window.location.href.split('?')[1].split('&')[1].split('=')[1];
+            let ckres = await fetch('/board/check',{
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            no:postId,
+                        }),
+                    });
+            let ckdata = await ckres.json();
+            let result = ckdata.result;
+            if(result===true)
+            {
+                if(confirm('삭제하시겠습니까?'))
+                {
+                    let res = await fetch(url,{
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            pass:null,
+                            no:postId,
+                        }),
+                    });
+                    let data = await res.json();
+                    if(data)
+                    {
+                        window.location.href = "http://14.38.252.76/board/lists?id=<%=listquery%>";//게시판으로 다시 돌아감
+                    }
+                    else
+                    {
+                        alert('게시글을 삭제하기 못하였습니다');
+                    }
+                }
+            }
+            else if(result ==='pass')
+            {
+                let pass = prompt('비밀번호를 입력해주세요');
+                if(pass)
+                {
+                    let res = await fetch(url,{
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            pass:pass,
+                            no:postId,
+                        }),
+                    });
+                    let data = await res.json();
+                    let result = data.result;
+                    if(result)
+                    {
+                        window.location.href = "http://14.38.252.76/board/lists?id=<%=listquery%>";//게시판으로 다시 돌아감
+                    }
+                    else
+                    {
+                        alert(data.msg);
+                    }
+                }
+            }
         }
     </script>
 </html>

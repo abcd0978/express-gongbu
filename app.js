@@ -88,7 +88,7 @@ app.use('/board',boardRouter);
 
 app.use((req,res,next)=>
 {
-    res.status(404).send('하 안된다! 404');
+    res.status(404).send('잘못된 접근입니다.');
 });
 
 const server = app.listen(app.get('port'),()=>

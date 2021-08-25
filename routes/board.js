@@ -77,10 +77,15 @@ router.route('/lists').get(async (req,res,next)=>//게시판 페이지 확인
 
 router.route('/view').get(async (req,res,next)=>//글열람
 {
-    let postNumber = req.query.no;
-    let listQ = req.query.id;
+    let postNumber = req.query.no;//게시글아이디
+    let listQ = req.query.id;//게시판아이디
     let data = {};
-
+    let isexist = await Post.findOne({where:{post_id:postNumber,wchboard:listQ},raw:true});
+    if(isexist===null)
+    {
+        res.status(404).send('잘못된 접근입니다.');
+        return;
+    }
     let post =  await Post.findOne({where:{post_id:postNumber},attributes:['title','content','ip','who','numOfCom','view','thmsup','thmsdwn','user_id',//게시글열람시 필요한 정보
     [sequelize.fn('date_format', sequelize.col('Post.createdAt'),'%Y-%m-%d %H:%i:%S'), 'createdAt']], raw:true, 
         include:[
@@ -99,7 +104,7 @@ router.route('/view').get(async (req,res,next)=>//글열람
     var realTitle = listQ==="comps"?realTitle="컴퓨터사이언스":realTitle=listQ;
     //타이틀
     data = {
-        title:realTitle,/*페이지 타이틀*/listquery:listQ,//쿼리내용
+        title:realTitle,/*페이지 타이틀*/listquery:listQ,postquery:postNumber,//쿼리내용
         hrefTitle:"http://14.38.252.76/board/lists?id="+listQ,h2title:realTitle,//제목
         post:post,//본문내용
         comment:comment, numOfCo:comment.length, //댓글정보와 댓글의 개수
@@ -122,7 +127,6 @@ router.route('/view').get(async (req,res,next)=>//글열람
             data.user_id = viewer;
             if(viewer === post.user_id)//맞는 유저면 
             {
-                console.log('여기');
                 data.update = true;
             }
             else
@@ -148,7 +152,6 @@ router.route('/view').get(async (req,res,next)=>//글열람
             data.user_id = viewer;
         }
     }
-
 
     res.render('posting',data);
 
@@ -201,6 +204,156 @@ router.route('/write').post(async(req,res,next)=>//글쓰기 요청
     }
     await Post.create(data);
     res.send(true);
+});
+router.route('/modify').get(async (req,res,next)=>//수정 창에 들어감
+{
+    //로그인유저는 그냥 들여주고 익명유저는 비번창으로 렌더링한후에 modify로 post요청이 들어오면 그때 수정창 렌더링해줌
+    let postId = req.query.no;//게시글 아이디
+    let loged = req.session.passport;//세션 패스포트
+    let listQ = req.query.id;//게시판 아이디
+    let realTitle;
+    realTitle = listQ==="comps"?realTitle="컴퓨터사이언스":realTitle=listQ;
+    let isexsist = await Post.findOne({where:{post_id:postId},raw:true});
+    if(isexsist===null)//글이 존재하는지 확인
+    {
+        res.status(404).send('잘못된 접근입니다.');
+        return;
+    }
+    let isLogedPost = await Post.findOne({where:{post_id:postId},attributes:['user_id'],raw:true});//로그인한 유저가 쓴글인지 확인
+    if(isLogedPost.user_id)
+    {
+        if(loged===undefined)
+        {
+            res.status(404).send('잘못된 접근입니다.');
+            return;
+        }
+        let userId = loged.user;
+        let isthere = await Post.findOne({where:{post_id:postId,user_id:userId},raw:true,attributes:['content','title']});//postId는 유일함 userId로 다시 검증
+        if(isthere.content===null || isthere.title===null)
+        {
+            res.status(404).send('잘못된 접근입니다.');
+            return;
+        }
+        let data = {
+            h2title: realTitle, 
+            hrefTitle:"http://14.38.252.76/board/lists?id="+listQ,
+            islogged:true,//작성자 비번 보여주냐-->true면 안보여줌
+            content:isthere.content,
+            title:isthere.title,
+            isLogedPost:true,//수정창 보여주냐,
+            postId:postId,//게시글 아이디
+        };
+        res.render('modifing',data);
+        return;
+    }
+    else//비밀번호 입력 창 렌더링
+    {
+        let data = {
+            h2title: realTitle,
+            hrefTitle:"http://14.38.252.76/board/lists?id="+listQ,
+            isLogedPost:false,//수정창 보여주냐
+            postId:postId,//게시글 아이디
+        };
+        res.render('modifing',data);
+    }
+});
+router.route('/modify').post(async (req,res,next)=>//비밀번호 제출
+{
+    let password = req.body.pass;
+    var postId = req.body.no;
+    let listQ = req.body.list;
+    let realTitle;
+    realTitle = listQ==="comps"?realTitle="컴퓨터사이언스":realTitle=listQ;
+    let isthere = await Post.findOne({where:{post_id:postId,password:password},attributes:['content','title','who','password'],raw:true});
+    if(isthere===null)
+    {
+        res.send("<script>alert('비밀번호가 틀립니다.'); window.location.href = '/board/modify?id="+listQ+"&no="+no+"';</script>");
+    }
+    else
+    {
+        let data = {
+            h2title: realTitle,
+            hrefTitle:"http://14.38.252.76/board/lists?id="+listQ,
+            islogged:false,//익명게시글이므로 비번란과 작성자란은 보여진다
+            content:isthere.content,
+            title:isthere.title,
+            author:isthere.who,
+            isLogedPost:true,//수정창 보여줌
+            postId:postId,//게시글 아이디
+        };
+        res.render('modifing',data);
+    }
+});
+router.route('modify/submit').post(async (req,res,next)=>//비
+{
+    let title = req.body.title;
+    let isImage = req.body.isImage;
+    let content = req.body.content;
+    let no = req.body.no;
+    console.log(title,isImage,content,no);
+});
+router.route('/delete').post(async (req,res,next)=>//삭제 하기
+{
+    //let listQ = req.query.id;//게시판 아이디
+    let postId = req.body.no;//게시글 아이디
+    let loged = req.session.passport;//세션 패스포트
+    let password = req.body.pass;//패스워드
+    if(password===null)
+    {
+        if(loged===undefined)//로그인안했으면
+        {
+            res.send({result:false,msg:'잘못된접근입니다'});//삭제안함
+            return;
+        }
+        let userId = loged.user;
+        let isthere = await Post.findOne({where:{post_id:postId,user_id:userId}});//postId는 유일함 userId로 다시 검증
+        if(isthere===null)//다른사람이 삭제요청 할때
+        {
+            res.send({result:false,msg:'잘못된접근입니다'});//그땐 삭제안함
+            return;
+        }
+        await Post.destroy({where:{post_id:postId}});
+        console.log(postId+"번 게시글 삭제됨");
+        res.send(true);
+        return;
+    }
+    else
+    {
+       let isthere = await Post.findOne({where:{post_id:postId,password:password}});
+       console.log(isthere);
+       if(isthere===null)
+       {
+           res.send({result:false,msg:'비밀번호가 틀렸습니다'});
+           return;
+       }
+       await Post.destroy({where:{post_id:postId}});
+        console.log(postId+"번 게시글 삭제됨");
+        res.send({result:true});
+        return;
+    }
+    
+});
+router.route('/check').post(async (req,res,next)=>
+{
+    let no = req.body.no;//게시글 아이디
+    let temp = await Post.findOne({where:{post_id:no},attributes:['user_id'],raw:true});
+    let isLogedAuthor = temp.user_id;
+    if(isLogedAuthor===null)
+    {
+        res.send({result:'pass'});//익명의 게시글
+    }
+    else
+    {
+        if(req.session.passport===undefined)
+        {
+            res.send({result:false});//다른 사용자가 쓴 게시글
+        }
+        else
+        {
+            let userId = req.session.passport.user;
+            res.send({result:isLogedAuthor===userId});
+        }
+    }
 });
 router.route('/uploads').post(imageUpload.single('upload'),(req,res,next)=>//사진 업로드
 {
@@ -285,7 +438,9 @@ router.route('/comment/delete_submit').post(async (req,res,next)=>//댓글삭제
 {
     let commentId = req.body.comno;
     let commentPassword = req.body.pass;
+    let no = req.body.post_id;
     const response = await Comment.destroy({where:{id:commentId,password:commentPassword}});
+    await Post.update({ numOfCom: sequelize.literal('numOfCom - 1') }, { where: { post_id: no } });
     if(response)
     {
         res.send(true);
