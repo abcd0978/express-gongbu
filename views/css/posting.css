@@ -142,5 +142,6 @@ li::after
 figure > img
 {
   max-width: 55%;
+  min-width:400px;
   object-fit: scale-down;
 }
