@@ -192,6 +192,10 @@ router.route('/write').post(async(req,res,next)=>//글쓰기 요청
             res.send("잘못된 접근입니다.");
         }
     }
+    if(content===''||title===null||title==='')
+    {
+        res.status(404).send('잘못된접근입니다');
+    }
     let data = {
         title:title,
         who:who,
@@ -284,13 +288,24 @@ router.route('/modify').post(async (req,res,next)=>//비밀번호 제출
         res.render('modifing',data);
     }
 });
-router.route('modify/submit').post(async (req,res,next)=>//비
+router.route('/modify/modify_submit').post(async (req,res,next)=>//비
 {
     let title = req.body.title;
     let isImage = req.body.isImage;
     let content = req.body.content;
     let no = req.body.no;
-    console.log(title,isImage,content,no);
+    if(content===''||content===null||title===null||title==='')
+    {
+        res.status(404).send('잘못된접근입니다');
+    }
+    await Post.update({title:title,isimg:isImage,content:content},{where:{post_id:no}})
+    .then(fulfilled=>
+    {
+        res.send(true);
+    }).then(err=>
+    {
+        res.send(false);
+    })
 });
 router.route('/delete').post(async (req,res,next)=>//삭제 하기
 {

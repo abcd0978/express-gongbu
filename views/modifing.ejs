@@ -126,6 +126,7 @@
       }
     </style>
     <script>
+      var submit = document.getElementById('submitButton');
       ClassicEditor
           .create( document.querySelector( '#editor' ),
           {
@@ -183,10 +184,14 @@
             {
               e.preventDefault();
               var title = document.getElementById('titleInput');
-              var submit = document.getElementById('submitButton');
               let titleVal = title.value;
               let passwordVal = null;
               let content = editor.getData();
+              if(content===''||content===null||titleVal===null||titleVal==='')
+              {
+                alert('제목또는 본문이 비어있습니다');
+                return false;
+              }
               let isImage;
               let no = '<%=postId%>';
               editor.getData().indexOf('<img') < 0 ? isImage = false : isImage = true;
@@ -204,11 +209,15 @@
                           no:parseInt(no),
                         })
                   };
-              let res = await fetch('/board/modify/submit',data);
+              let res = await fetch('/board/modify/modify_submit',data);
               let resData = await res.json();
               if(resData)
               {
                 window.location.href = "<%= hrefTitle %>";
+              }
+              else
+              {
+                alert('게시글을 수정하지 못하였습니다');
               }
             })
 
