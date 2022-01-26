@@ -131,7 +131,7 @@
             //});
             var userEmailCheck = function(msg)
             {
-                var emailvalue = $('#email').val();
+                var emailvalue = $('#email').val();//email이라는 id를 가진태그의 value를 가져옴
                 var checkDup;
                 var request = $.ajax({
                     url: "/login/check",
