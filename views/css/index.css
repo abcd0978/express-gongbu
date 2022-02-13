@@ -190,3 +190,12 @@ body, html
                                 font-weight: 600;
                                 font-style: normal;
                             }
+                    footer #footer_logo
+                    {
+                        text-align: center;
+                    }
+                    footer #footer_texts
+                    {
+                        text-align: center;
+                        font-size: 11px;
+                    }

@@ -1,5 +1,4 @@
 exports.isLoggedIn = (req, res, next) => {
-    console.log('호출됨');
     if (req.isAuthenticated()) {
       console.log('isLoggedin에서-- 로그인됨');
       next();
@@ -9,7 +8,6 @@ exports.isLoggedIn = (req, res, next) => {
   }
   
 exports.isNotLoggedIn = (req, res, next) => {
-    console.log('호출됨');
     if (!req.isAuthenticated()) {
       console.log('isNotLoggedin에서-- 로그인풀림');
       next();
@@ -18,4 +16,23 @@ exports.isNotLoggedIn = (req, res, next) => {
       const message = encodeURIComponent('로그인한 상태입니다.');
       res.redirect(`/?error=${message}`);
     }
+}
+exports.loginCheck = (req,res,next)=>{
+  if(req.isAuthenticated())
+  {
+    req.body.loginCheck = true;
+    next();
+  }else{
+    req.body.loginCheck = false
+    next();
   }
+}
+exports.isAuthorOf = (req,res,next)=>{
+  if(req.isAuthenticated())
+  {
+    
+  }
+  else{
+    res.redirect('/login')
+  }
+}

@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const passport = require('passport');
 const router = express.Router();//라우터 받아옴
+const User = require('../models/user');
+const {loginCheck} = require('../middlewares/authMiddleware')
 
 router.use(express.json()); 
 router.use(express.urlencoded( {extended : true } ));
@@ -37,15 +39,12 @@ router.route('/check').post(async(req,res,next)=>//회원가입 유효성 체크
         console.log(err);
     }
 });
-router.get('/check2',(req,res)=>//로그인여부
-{
-    if(req.isAuthenticated())
-    {
-        res.send({login:true, name:req.user.name});//맞으면 로그인여부와 닉네임 반환
+router.post('/logincheck',loginCheck, async(req,res)=>{
+    if(req.body.loginCheck){
+        let user = await User.findOne({attributes:['name']},{where:{user_id:req.session.passport.user}})
+        res.send({result:true, name:user.name});
+    }else{
+        res.send({result:false});
     }
-    else
-    {
-        res.send(false);
-    }
-});
+})
 module.exports = router;

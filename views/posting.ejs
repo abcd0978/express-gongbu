@@ -82,7 +82,7 @@
                                 </span>
                                 <span class="numberOfComments">
                                     댓글:
-                                    <%= post.numOfCom %>
+                                    <%= numOfCom %>
                                 </span>
                             </div>
                         </div>
@@ -102,7 +102,7 @@
                                 <p class="font_red" id="recomend">0</p>
                             </div>
 
-                            <button class="button_up">
+                            <button class="button_up" onclick="thumbsUp()">
                                 <img src="../ico/gaechu-before.png">
                             </button>
                         </div>
@@ -111,7 +111,7 @@
                             <div class="down_numbox">
                                 <p class="font_grey" id="notrecomend">0</p>
                             </div>
-                            <button class="button_down">
+                            <button class="button_down" onclick="thumbsDown()">
                                 <img src="../ico/bichu.png">
                             </button>
                         </div>
@@ -123,7 +123,7 @@
                 <div class="commentbox">
                     <!--댓글 영역-->
                     <ul class="cmt_list">
-                        <% for(let i=0;i<numOfCo;i++) { %>
+                        <% for(let i=0;i<numOfCom;i++) { %>
                             <% var deleteButtonFlag %>
                             <% var Who; %>
                             <% if(comment[i]['User.name']===null) { %>
@@ -135,8 +135,12 @@
                                     <div id="whoAreYou">
                                         <span id="nameipspan">
                                             <%= Who %>
+                                            <% if(comment[i].user_id) { %>
+                                                <img src="../images/logged.png"/>
+                                            <% } %>
                                         </span>
                                     </div>
+                                    
 
                                     <div id="cmtcontent">
                                         <%= comment[i].comment %>
@@ -182,69 +186,42 @@
     </body>
         
     <script>
-        var no = window.location.href.split('&')[1].split('=')[1];//게시글 번호
+        const post_id = window.location.href.split('&')[1].split('=')[1];//게시글 번호
+        const fetchComment = async(who,pass,cmt,no)=>//댓글 함수
+        {
+            let data = 
+            {
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({who:who, password:pass,comment:cmt,post_id:post_id})
+            };
+            const res = await fetch('/comment/saveComment',data);
+            const resdata = await res.json();
+            return resdata;
+        }
         async function addcomment()//서버에서 한번더 체크함
         {
-            var cmt = document.getElementById('cmtInput').value;//댓글
-            const loginFlag = async ()=> {
-                const res = await fetch('/validcheck/check2');
-                const data = await res.json();
-                return data.login;
+            
+            let cmt = document.getElementById('cmtInput').value;//댓글
+            if(cmt===null || cmt===''){
+                alert('댓글을 입력해주세요');
+                return false;
             }
-            const fetchComment = async(who,pass,cmt,loginFlag)=>
-            {
-                let data = 
-                {
-                    method: 'POST',
-                    headers:{
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({who:who, password:pass,comment:cmt,Flag:loginFlag,post_id:no})
-                };
-                const res = await fetch('/board/comment',data);
-                const resdata = await res.json();
-                return resdata;
-            }
-            if(await loginFlag())//로그인 했을시에
-            {
-                if(cmt===null || cmt==='')
-                {
-                    alert('댓글을 입력해주세요');
-                    return false;
-                }
-                let res = await fetchComment(null,null,cmt,loginFlag);
-                if(res)
-                {
-                    window.location.reload();
-                }
-                else
-                {
-                    alert('잘못된 접근입니다.');
-                }
-            }
-            else//로그인 안 했을 시에
-            {
-                let pass = document.getElementById('passInput').value;//비번
-                let name = document.getElementById('NameInput').value;//이름
-                if(cmt===null || cmt==='')
-                {
-                    alert('댓글을 입력해주세요');
-                    return false;
-                }
-                if(name===''||name===null||pass===''||pass===null)
-                {
-                    alert('이름또는 패스워드가 입력되지 않았습니다.');
-                    return false;
-                }
-                let res = await fetchComment(name,pass,cmt,loginFlag);
-                if(res)
-                {
-                    window.location.reload();
-                }
-                else
-                {
-                    alert('잘못된 접근입니다.');
-                }
+            
+            let pass = document.getElementById('passInput');
+            if(pass)
+                pass = pass.value;
+            else
+                pass = null;
+            let name = document.getElementById('NameInput').value;//이름
+
+            let res = await fetchComment(name,pass,cmt,post_id)
+            if(res.success){
+                window.location.reload();
+            }else{
+                alert(res.err);
             }
         }
         /*댓글 지우기*/
@@ -265,9 +242,9 @@
                     headers:{
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({comno: comment_num,pass:password,post_id:no})
+                    body: JSON.stringify({comno: comment_num,pass:password,post_id:post_id})
                 };
-                const res = await fetch('/board/comment/delete_submit',data);
+                const res = await fetch('/comment/deleteComment',data);
                 const resdata = await res.json();
                 if(resdata)
                 {
@@ -304,20 +281,27 @@
                 });
             });
         });
+        function thumbsUp()
+        {
+            alert('hello');
+        }
+        function thumbsDown()
+        {
+            alert('hello');
+        }
         async function goUpdate(url)
         {
             window.location.href = url;
         }
         async function goDelete(url)
         {
-            let postId = window.location.href.split('?')[1].split('&')[1].split('=')[1];
             let ckres = await fetch('/board/check',{
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                            no:postId,
+                            no:post_id,
                         }),
                     });
             let ckdata = await ckres.json();
@@ -333,7 +317,7 @@
                         },
                         body: JSON.stringify({
                             pass:null,
-                            no:postId,
+                            no:post_id,
                         }),
                     });
                     let data = await res.json();
@@ -359,7 +343,7 @@
                         },
                         body: JSON.stringify({
                             pass:pass,
-                            no:postId,
+                            no:post_id,
                         }),
                     });
                     let data = await res.json();

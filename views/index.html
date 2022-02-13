@@ -59,10 +59,21 @@
 
             </div>
 
+
             <footer>
-                <h1>
-                    이부분은 footer입니다.
-                </h1>
+                <div class="footer_box">
+                    <div id="footer_logo">
+                        <a href="https://github.com/abcd0978">
+                            <img src="./ico/github.png">
+                        </a>
+                    </div>
+
+                    <div id="footer_texts">
+                        Author: 김민규 <br>
+                        Email: kimmin36944@gmail.com<br>
+                        Everything in this site is copyleft: free to copy<br>
+                    </div>
+                </div>
             </footer>
 
         </div>
@@ -72,8 +83,8 @@
     <script>
         function isLoggedin()
         {
-            fetch('/validcheck/check2',{
-            method: 'GET',
+            fetch('/validcheck/logincheck',{
+            method: 'POST',
             credentials:'include',
             })
             .then(res=>
@@ -82,7 +93,7 @@
             })
             .then(res=>
             {
-                if(res.login)//로그인 되어있을시에 로그아웃 주소로 돌림
+                if(res.result)//로그인 되어있을시에 로그아웃 주소로 돌림
                 {
                     document.getElementById('loginText').innerText="로그아웃";
                     document.getElementById('sayhi').innerText=res.name+"님 안녕하세요!";

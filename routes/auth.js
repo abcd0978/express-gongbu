@@ -3,7 +3,7 @@ const path = require('path');
 const session = require('express-session');
 const User = require('../models/user');
 const passport = require('passport');
-const {isNotLoggedIn, isLoggedIn} = require('./middlewares');
+const {isNotLoggedIn, isLoggedIn} = require('../middlewares/authMiddleware');
 const router = express.Router();
 const Crypto = require('crypto');
 const bodyParser = require('body-parser');
@@ -49,20 +49,17 @@ router.post('/submit',isNotLoggedIn,(req,res,next)=>//로그인 처리 passport�
     {
         if(err)//서버에러시에
         {
-            console.log(err);
             return next(err);
         }
         if(!user)//로그인 실패시에
         {
             console.log('로그인 실패');
-            console.log(info);
             return res.send(info);
         }
         return req.login(user,(loginErr)=>
         {
             if(loginErr)
             {
-                console.log('에러남');
                 console.error(loginErr);
                 return next(loginErr);
             }
